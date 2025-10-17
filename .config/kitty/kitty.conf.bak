@@ -1,0 +1,11 @@
+# Window
+hide_window_decorations titlebar-only
+background_opacity 0.75
+window_margin_width 6
+
+
+# Font
+font_family BlexMono Nerd Font Propo
+font_size 18.0
+font_features -liga
+
