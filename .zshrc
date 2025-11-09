@@ -5,14 +5,14 @@
 # -----------------------------------------------------------------------------
 # Environment Variables & PATH Configuration
 # -----------------------------------------------------------------------------
-export EDITOR="vim"
-
-export PATH=$(brew --prefix)/bin:$(brew --prefix)/sbin:$PATH
-. "/Users/andromeda/.deno/env"
+export EDITOR="nvim"
 
 # -----------------------------------------------------------------------------
 # Tool Configuration & Initialization
 # -----------------------------------------------------------------------------
+
+# Homebrew
+export PATH=$(brew --prefix)/bin:$(brew --prefix)/sbin:$PATH
 
 # NVM (Node Version Manager)
 export NVM_DIR="$HOME/.nvm"
@@ -44,6 +44,9 @@ if command -v starship &>/dev/null; then
 
   eval "$(starship init zsh)"
 fi
+
+# Ripgrep
+export RIPGREP_CONFIG_PATH=~/.config/ripgrep/.ripgreprc
 
 # -----------------------------------------------------------------------------
 # Git Configuration
@@ -108,6 +111,7 @@ fi
 # General Shortcuts & Utilities
 # -----------------------------------------------------------------------------
 alias c="clear"
+alias n="nvim"
 
 # =============================================================================
 # End of Configuration
