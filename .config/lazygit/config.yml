@@ -1,0 +1,8 @@
+gui:
+  nerdFontsVersion: "3"
+  showFileIcons: false
+  showCommandLog: false
+
+git:
+  pagers:
+    - pager: diff-so-fancy

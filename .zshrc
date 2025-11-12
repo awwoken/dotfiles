@@ -14,6 +14,9 @@ export EDITOR="nvim"
 # Homebrew
 export PATH=$(brew --prefix)/bin:$(brew --prefix)/sbin:$PATH
 
+# LazyGit
+export XDG_CONFIG_HOME="$HOME/.config"
+
 # NVM (Node Version Manager)
 export NVM_DIR="$HOME/.nvm"
 if [ -s "$NVM_DIR/nvm.sh" ]; then
@@ -110,8 +113,9 @@ fi
 # -----------------------------------------------------------------------------
 # General Shortcuts & Utilities
 # -----------------------------------------------------------------------------
-alias c="clear"
+alias lg="lazygit"
 alias n="nvim"
+alias c="clear"
 
 # =============================================================================
 # End of Configuration

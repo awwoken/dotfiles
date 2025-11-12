@@ -172,7 +172,14 @@ end, { silent = true })
 local MiniFiles = require("mini.files")
 
 vim.keymap.set("n", "<leader>e", function()
-	MiniFiles.open(vim.api.nvim_buf_get_name(0))
+  local bufname = vim.api.nvim_buf_get_name(0)
+
+  if bufname:match("^minifiles://") then
+    -- Already in MiniFiles buffer, ignore
+    return
+  end
+
+	MiniFiles.open(bufname)
 	MiniFiles.reveal_cwd()
 end, { silent = true, noremap = true })
 
