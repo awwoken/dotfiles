@@ -1,3 +1,5 @@
+-- TODO: Dedupe using source ~/.vimrc
+
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
@@ -66,15 +68,8 @@ vim.diagnostic.config({
 	update_in_insert = false,
 })
 
--- local statusline = {
--- 	" %t", "%r", "%m", "%=", "%{&filetype}", " %2p%%", " %3l:%-2c ",
--- }
--- vim.o.statusline = table.concat(statusline, "")
-
 
 -- Invisible backgorund
--- vim.cmd([[colorscheme miniwinter]])
-
 vim.cmd([[
   hi Normal guibg=none ctermbg=none
   hi NormalNC guibg=none ctermbg=none
@@ -87,3 +82,4 @@ vim.cmd([[
   hi NormalFloat guibg=none
   hi FloatBorder guibg=none
 ]])
+

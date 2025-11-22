@@ -1,17 +1,18 @@
-local path_package = vim.fn.stdpath('data') .. '/site'
-local mini_path = path_package .. '/pack/deps/start/mini.nvim'
+local path_package = vim.fn.stdpath("data") .. "/site"
+local mini_path = path_package .. "/pack/deps/start/mini.nvim"
 
 if not vim.loop.fs_stat(mini_path) then
-  vim.cmd('echo "Installing `mini.nvim`" | redraw')
+	vim.cmd('echo "Installing `mini.nvim`" | redraw')
 
-  local clone_cmd = {
-    'git', 'clone', '--filter=blob:none',
-    'https://github.com/nvim-mini/mini.nvim', mini_path
-  }
-  vim.fn.system(clone_cmd)
+  -- stylua: ignore
+	local clone_cmd = {
+		"git", "clone", "--filter=blob:none",
+		"https://github.com/nvim-mini/mini.nvim", mini_path
+	}
+	vim.fn.system(clone_cmd)
 
-  vim.cmd('packadd mini.nvim | helptags ALL')
-  vim.cmd('echo "Installed `mini.nvim`" | redraw')
+	vim.cmd("packadd mini.nvim | helptags ALL")
+	vim.cmd('echo "Installed `mini.nvim`" | redraw')
 end
 
 local MiniDeps = require("mini.deps")
@@ -27,9 +28,9 @@ MiniDeps.add({ source = "wakatime/vim-wakatime" })
 
 MiniDeps.setup()
 
-local Treesitter = require("nvim-treesitter")
+local TreesitterConfigs = require("nvim-treesitter.configs")
 
-Treesitter.setup({
+TreesitterConfigs.setup({
   -- stylua: ignore
   ensure_installed = {
     "c", "cpp", "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline", "regex", "bash",
@@ -172,12 +173,12 @@ end, { silent = true })
 local MiniFiles = require("mini.files")
 
 vim.keymap.set("n", "<leader>e", function()
-  local bufname = vim.api.nvim_buf_get_name(0)
+	local bufname = vim.api.nvim_buf_get_name(0)
 
-  if bufname:match("^minifiles://") then
-    -- Already in MiniFiles buffer, ignore
-    return
-  end
+	if bufname:match("^minifiles://") then
+		-- Already in MiniFiles buffer, ignore
+		return
+	end
 
 	MiniFiles.open(bufname)
 	MiniFiles.reveal_cwd()
@@ -242,6 +243,6 @@ local MiniPairs = require("mini.pairs")
 
 MiniPairs.setup()
 
-local TsAutotag = require("nvim-ts-autotag")
 
+local TsAutotag = require("nvim-ts-autotag")
 TsAutotag.setup()
