@@ -30,7 +30,12 @@ return {
 			toml = { "taplo" },
 			graphql = { "prettierd" },
 			sh = { "shfmt" },
+			python = {
+				"ruff_format",
+				"ruff_organize_imports",
+			},
 			zsh = { "shfmt" },
+			cpp = { "clang_format" },
 		},
 	},
 }

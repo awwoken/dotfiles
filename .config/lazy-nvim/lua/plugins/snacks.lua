@@ -1,5 +1,7 @@
 return {
 	"folke/snacks.nvim",
+	lazy = false, -- `snacks.nvim` should not be lazy-loaded
+	priority = 1000,
 	opts = {
 		bigfile = {
 			-- leave it empty to use the default settings
@@ -63,13 +65,18 @@ return {
 			preset = {
 				pick = nil, -- Defaults to a picker that supports `fzf-lua`, `telescope.nvim` and `mini.pick`
 				keys = {
-					{ icon = " ", key = "f", desc = "Find File", action = ":lua Snacks.dashboard.pick('files')" },
+					{
+						icon = " ",
+						key = "f",
+						desc = "Find File",
+						action = ":lua require(\"snacks\").dashboard.pick('files')",
+					},
 					{ icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
 					{
 						icon = " ",
 						key = "g",
 						desc = "Find Text",
-						action = ":lua Snacks.dashboard.pick('live_grep')",
+						action = ":lua require(\"snacks\").dashboard.pick('live_grep')",
 					},
 					{
 						icon = " ", -- Folder icon for Explorer
@@ -79,14 +86,14 @@ return {
 							-- Close the dashboard buffer
 							vim.cmd("bd!")
 							-- Open Snacks Explorer
-							Snacks.explorer()
+							require("snacks").explorer()
 						end,
 					},
 					{
 						icon = " ",
 						key = "c",
 						desc = "Config",
-						action = ":lua Snacks.dashboard.pick('files', {cwd = vim.fn.stdpath('config')})",
+						action = ":lua require(\"snacks\").dashboard.pick('files', {cwd = vim.fn.stdpath('config')})",
 					},
 					{
 						icon = "󰒲 ",
@@ -159,7 +166,7 @@ return {
 				if vim.api.nvim_get_current_win() ~= explorer_win and explorer_win then
 					vim.api.nvim_set_current_win(explorer_win)
 				else
-					Snacks.explorer()
+					require("snacks").explorer()
 				end
 			end,
 			desc = "Snacks File Explorer",
@@ -169,7 +176,7 @@ return {
 		{
 			"<leader>lg",
 			function()
-				Snacks.lazygit()
+				require("snacks").lazygit()
 			end,
 			desc = "Snacks LazyGit",
 		},
@@ -178,21 +185,21 @@ return {
 		{
 			"<leader><space>",
 			function()
-				Snacks.picker.smart()
+				require("snacks").picker.smart()
 			end,
 			desc = "Smart Find Files",
 		},
 		{
 			"<leader>fg",
 			function()
-				Snacks.picker.grep()
+				require("snacks").picker.grep()
 			end,
 			desc = "Grep",
 		},
 		{
 			"<leader>ff",
 			function()
-				Snacks.picker.files()
+				require("snacks").picker.files()
 			end,
 			desc = "Find Files",
 		},
@@ -200,35 +207,35 @@ return {
 		-- {
 		-- 	"<leader>gi",
 		-- 	function()
-		-- 		Snacks.picker.gh_issue()
+		-- 		require("snacks").picker.gh_issue()
 		-- 	end,
 		-- 	desc = "GitHub Issues (open)",
 		-- },
 		-- {
 		-- 	"<leader>gI",
 		-- 	function()
-		-- 		Snacks.picker.gh_issue({ state = "all" })
+		-- 		require("snacks").picker.gh_issue({ state = "all" })
 		-- 	end,
 		-- 	desc = "GitHub Issues (all)",
 		-- },
 		-- {
 		-- 	"<leader>gp",
 		-- 	function()
-		-- 		Snacks.picker.gh_pr()
+		-- 		require("snacks").picker.gh_pr()
 		-- 	end,
 		-- 	desc = "GitHub Pull Requests (open)",
 		-- },
 		-- {
 		-- 	"<leader>gP",
 		-- 	function()
-		-- 		Snacks.picker.gh_pr({ state = "all" })
+		-- 		require("snacks").picker.gh_pr({ state = "all" })
 		-- 	end,
 		-- 	desc = "GitHub Pull Requests (all)",
 		-- },
 		{
 			"<leader>fD",
 			function()
-				Snacks.picker.diagnostics_buffer()
+				require("snacks").picker.diagnostics_buffer()
 			end,
 			desc = "Buffer Diagnostics",
 		},
@@ -236,14 +243,14 @@ return {
 		{
 			"gd",
 			function()
-				Snacks.picker.lsp_definitions()
+				require("snacks").picker.lsp_definitions()
 			end,
 			desc = "Goto Definition",
 		},
 		{
 			"gr",
 			function()
-				Snacks.picker.lsp_references()
+				require("snacks").picker.lsp_references()
 			end,
 			nowait = true,
 			desc = "References",
@@ -251,7 +258,7 @@ return {
 		{
 			"gt",
 			function()
-				Snacks.picker.lsp_type_definitions()
+				require("snacks").picker.lsp_type_definitions()
 			end,
 			desc = "Goto Type Definition",
 		},

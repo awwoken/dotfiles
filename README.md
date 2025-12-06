@@ -12,3 +12,5 @@
 * ffmpeg
 * vim
 * neovim
+* lazygit
+* diff-so-fancy

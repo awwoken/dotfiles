@@ -14,6 +14,8 @@
 --glob=!__pycache__
 --glob=!.idea
 --glob=!.vscode
+--glob=!venv
+--glob=!.venv
 
 --glob=!package-lock.json
 --glob=!yarn.lock

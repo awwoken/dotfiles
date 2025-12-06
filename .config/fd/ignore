@@ -12,6 +12,8 @@ out
 __pycache__
 .idea
 .vscode
+venv
+.venv
 
 package-lock.json
 yarn.lock

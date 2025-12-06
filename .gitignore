@@ -2,3 +2,11 @@
 .config/kitty/current-theme.conf
 .config/kitty/no-preference-theme.auto.conf
 .config/kitty/kitty.conf.bak
+
+# Zed config files
+.config/zed/**
+!.config/zed/keymap.json
+!.config/zed/settings.json
+
+# macOS
+**/.DS_Store

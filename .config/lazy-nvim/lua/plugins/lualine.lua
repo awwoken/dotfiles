@@ -1,8 +1,7 @@
 return {
 	"nvim-lualine/lualine.nvim",
-	dependencies = {
-		"bwpge/lualine-pretty-path",
-	},
+	"bwpge/lualine-pretty-path",
+	dependencies = {},
 	event = "VeryLazy",
 	init = function()
 		vim.g.lualine_laststatus = vim.o.laststatus
@@ -67,7 +66,7 @@ return {
 							return package.loaded["noice"] and require("noice").api.status.command.has()
 						end,
 						color = function()
-							return { fg = Snacks.util.color("Statement") }
+							return { fg = require("snacks").util.color("Statement") }
 						end,
 					},
 					{
@@ -78,7 +77,7 @@ return {
 							return package.loaded["noice"] and require("noice").api.status.mode.has()
 						end,
 						color = function()
-							return { fg = Snacks.util.color("Constant") }
+							return { fg = require("snacks").util.color("Constant") }
 						end,
 					},
 					{

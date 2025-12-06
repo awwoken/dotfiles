@@ -1,24 +1,14 @@
-# =============================================================================
-# ZSH Configuration File
-# =============================================================================
-
-# -----------------------------------------------------------------------------
 # Environment Variables & PATH Configuration
-# -----------------------------------------------------------------------------
 export EDITOR="vim"
 
 alias mini='NVIM_APPNAME="mini-nvim" nvim'
 alias lazy='NVIM_APPNAME="lazy-nvim" nvim'
 
-# -----------------------------------------------------------------------------
-# Tool Configuration & Initialization
-# -----------------------------------------------------------------------------
-
 # Homebrew
 export PATH=$(brew --prefix)/bin:$(brew --prefix)/sbin:$PATH
 export HOMEBREW_NO_ENV_HINTS=1
 
-# LazyGit
+# LazyGit (git TUI)
 export XDG_CONFIG_HOME="$HOME/.config"
 
 # NVM (Node Version Manager)
@@ -58,9 +48,8 @@ export RIPGREP_CONFIG_PATH=~/.config/ripgrep/.ripgreprc
 # Brew (managed by tap)
 export HOMEBREW_NO_AUTO_UPDATE=1
 
-# -----------------------------------------------------------------------------
-# Git Configuration
-# -----------------------------------------------------------------------------
+# Eza (enhanced directory listing)
+alias l="eza -A --oneline --long --group-directories-first --classify=auto --color=never --ignore-glob=\"node_modules\" --ignore-glob=\".git\""
 
 # Git Basic Aliases
 alias gs="git status --short"
@@ -69,8 +58,8 @@ alias gcb="git checkout -b"
 
 # Git Advanced Aliases
 alias gl="git log --graph --pretty=format:\"%C(magenta)%h %C(white) %an  %ar%C(blue)  %D%n%s%n\""
-alias gd="git diff --output-indicator-new=\" \" --output-indicator-old=\" \""
 alias gpo="git push origin \$(git rev-parse --abbrev-ref HEAD)"
+alias gpfo="git push origin \$(git rev-parse --abbrev-ref HEAD) --force-with-lease"
 
 # Git Functions
 git_add() {
@@ -106,23 +95,6 @@ git_checkout_hard() {
 }
 alias gch="git_checkout_hard"
 
-# -----------------------------------------------------------------------------
-# File Operations & Directory Navigation
-# -----------------------------------------------------------------------------
-
-# Enhanced directory listing with eza
-if command -v eza &>/dev/null; then
-  alias l="eza -A --oneline --long --group-directories-first --classify=auto --color=never --ignore-glob=\"node_modules\" --ignore-glob=\".git\""
-else
-  alias l="ls -la"
-fi
-
-# -----------------------------------------------------------------------------
-# General Shortcuts & Utilities
-# -----------------------------------------------------------------------------
+# Shortcuts
 alias lg="lazygit"
 alias c="clear"
-
-# =============================================================================
-# End of Configuration
-# =============================================================================

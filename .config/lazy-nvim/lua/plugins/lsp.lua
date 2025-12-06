@@ -29,6 +29,8 @@ return {
 					"json-lsp",
 					"shfmt",
 					"clangd",
+					"pyright",
+					"ruff",
 					"eslint-lsp",
 				},
 				auto_update = true,
@@ -85,13 +87,6 @@ return {
 			map("n", "<leader>d", vim.lsp.buf.hover, { desc = "Hover" })
 			map("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
 			map("n", "<leader>cr", vim.lsp.buf.rename, { desc = "Rename" })
-
-			vim.api.nvim_create_autocmd("LspAttach", {
-				callback = function(args)
-					local bufnr = args.buf
-					vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-				end,
-			})
 
 			-- TypeScript — prefer git root in monorepos
 			vim.lsp.config("ts_ls", {
