@@ -45,7 +45,6 @@ set nobackup
 set nowritebackup
 
 " Scroll offset + no wrapping
-set scrolloff=10
 set nowrap
 
 " Shortmess append
@@ -56,4 +55,16 @@ set pumheight=10
 
 " Remove automatic comment continuation
 autocmd BufWinEnter * setlocal formatoptions-=cro
+
+" Save on Space+w
+nnoremap <silent> <leader>w :w<CR>
+
+" Netrw on Space+e
+nnoremap <silent> <leader>e :Ex<CR>
+
+" Sync current directory and browsing directory
+let g:netrw_keepdir = 0
+
+" Hide banner
+let g:netrw_banner = 0
 

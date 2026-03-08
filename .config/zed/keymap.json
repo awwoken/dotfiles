@@ -1,98 +1,152 @@
 [
-  {
-    "context": "Editor && vim_mode == normal && !VimWaiting && !menu",
-    "bindings": {
-      // panes movement
-      "ctrl-h": "workspace::ActivatePaneLeft",
-      "ctrl-l": "workspace::ActivatePaneRight",
-      "ctrl-k": "workspace::ActivatePaneUp",
-      "ctrl-j": "workspace::ActivatePaneDown",
+    {
+        "context": "Editor && vim_mode == normal && !VimWaiting && !menu",
+        "bindings": {
+            // panes movement
+            "ctrl-h": "workspace::ActivatePaneLeft",
+            "ctrl-l": "workspace::ActivatePaneRight",
+            "ctrl-k": "workspace::ActivatePaneUp",
+            "ctrl-j": "workspace::ActivatePaneDown",
 
-      // file explorer
-      "space e": "vim::ToggleProjectPanelFocus",
+            // file explorer
+            "space e": "vim::ToggleProjectPanelFocus",
 
-      // lsp actions
-      "space c a": "editor::ToggleCodeActions",
-      "space r n": "editor::Rename",
-      "space d": "editor::Hover",
+            // lsp actions
+            "space c a": "editor::ToggleCodeActions",
+            "space r n": "editor::Rename",
+            "space d": "editor::Hover",
 
-      // lsp hooks
-      "g d": "editor::GoToDefinition",
-      "g D": "editor::GoToDefinitionSplit",
-      "g i": "editor::GoToImplementation",
-      "g I": "editor::GoToImplementationSplit",
-      "g t": "editor::GoToTypeDefinition",
-      "g T": "editor::GoToTypeDefinitionSplit",
-      "g r": "editor::FindAllReferences",
+            // lsp hooks
+            "g d": "editor::GoToDefinition",
+            "g D": "editor::GoToDefinitionSplit",
+            "g i": "editor::GoToImplementation",
+            "g I": "editor::GoToImplementationSplit",
+            "g t": "editor::GoToTypeDefinition",
+            "g T": "editor::GoToTypeDefinitionSplit",
+            "g r": "editor::FindAllReferences",
 
-      // tabs actions
-      "shift-h": "pane::ActivatePreviousItem",
-      "shift-l": "pane::ActivateNextItem",
+            // Tags
+            "ctrl-o": "pane::GoToOlderTag",
+            "ctrl-O": "pane::GoToNewerTag",
 
-      "shift-q": "pane::CloseActiveItem",
-      "space Q": "pane::CloseOtherItems",
-      "space space": "file_finder::Toggle",
+            // tabs actions
+            "shift-h": "pane::ActivatePreviousItem",
+            "shift-l": "pane::ActivateNextItem",
 
-      "space w": "workspace::Save"
-    }
-  },
-  {
-    "context": "EmptyPane || SharedScreen",
-    "bindings": {
-      "space space": "file_finder::Toggle"
-    }
-  },
-  // zed specific
-  {
-    "context": "Editor && vim_operator == c",
-    "bindings": {
-      "c": "vim::CurrentLine",
-      "r": "editor::Rename"
-    }
-  },
-  {
-    "context": "Editor && vim_operator == c",
-    "bindings": {
-      "c": "vim::CurrentLine",
-      "a": "editor::ToggleCodeActions"
-    }
-  },
-  // terminal
-  {
-    "context": "Terminal",
-    "bindings": {
-      "ctrl-h": "workspace::ActivatePaneLeft",
-      "ctrl-l": "workspace::ActivatePaneRight",
-      "ctrl-k": "workspace::ActivatePaneUp",
-      "ctrl-j": "workspace::ActivatePaneDown"
-    }
-  },
-  // file explorer
-  {
-    "context": "ProjectPanel && not_editing",
-    "bindings": {
-      "l": "project_panel::OpenPermanent",
-      "q": "workspace::ToggleRightDock",
+            "shift-q": "pane::CloseActiveItem",
+            "space Q": "pane::CloseOtherItems",
+            "cmd-k": "pane::CloseOtherItems",
+            "space space": "file_finder::Toggle",
 
-      "a": "project_panel::NewFile",
-      "A": "project_panel::NewDirectory",
-      "r": "project_panel::Rename",
-      "d": "project_panel::Delete",
-      "x": "project_panel::Cut",
-      "c": "project_panel::Copy",
-      "p": "project_panel::Paste",
+            "space w": "workspace::Save",
+        },
+    },
+    {
+        "context": "EmptyPane || SharedScreen",
+        "bindings": {
+            "space space": "file_finder::Toggle",
+        },
+    },
+    // center ctrl-d and ctrl-u
+    {
+        "context": "ProjectPanel && not_editing",
+        "bindings": {
+            "ctrl-u": [
+                "action::Sequence",
+                [
+                    "project_panel::ScrollUp",
+                    "project_panel::ScrollCursorCenter",
+                ],
+            ],
+            "ctrl-d": [
+                "action::Sequence",
+                [
+                    "project_panel::ScrollDown",
+                    "project_panel::ScrollCursorCenter",
+                ],
+            ],
+        },
+    },
+    {
+        "context": "VimControl && !menu",
+        "bindings": {
+            "ctrl-u": [
+                "action::Sequence",
+                ["vim::ScrollUp", "editor::ScrollCursorCenter"],
+            ],
+            "ctrl-d": [
+                "action::Sequence",
+                ["vim::ScrollDown", "editor::ScrollCursorCenter"],
+            ],
+            "ctrl-f": [
+                "action::Sequence",
+                ["vim::PageDown", "editor::ScrollCursorCenter"],
+            ],
+            "ctrl-b": [
+                "action::Sequence",
+                ["vim::PageUp", "editor::ScrollCursorCenter"],
+            ],
+        },
+    },
+    // zed specific
+    {
+        "context": "Editor && vim_operator == c",
+        "bindings": {
+            "c": "vim::CurrentLine",
+            "r": "editor::Rename",
+        },
+    },
+    // move lines in visual
+    {
+        "context": "Editor && (vim_mode == normal || vim_mode == visual) && !VimWaiting && !menu",
+        "bindings": {
+            "shift-j": "editor::MoveLineDown",
+            "shift-k": "editor::MoveLineUp",
+        },
+    },
+    {
+        "context": "Editor && vim_operator == c",
+        "bindings": {
+            "c": "vim::CurrentLine",
+            "a": "editor::ToggleCodeActions",
+        },
+    },
+    // terminal
+    {
+        "context": "Terminal",
+        "bindings": {
+            "ctrl-h": "workspace::ActivatePaneLeft",
+            "ctrl-l": "workspace::ActivatePaneRight",
+            "ctrl-k": "workspace::ActivatePaneUp",
+            "ctrl-j": "workspace::ActivatePaneDown",
+        },
+    },
+    // file explorer
+    {
+        "context": "ProjectPanel && not_editing",
+        "bindings": {
+            "l": "project_panel::OpenPermanent",
+            "q": "workspace::ToggleRightDock",
 
-      "ctrl-h": "workspace::ActivatePaneLeft",
-      "ctrl-l": "workspace::ActivatePaneRight",
-      "ctrl-k": "workspace::ActivatePaneUp",
-      "ctrl-j": "workspace::ActivatePaneDown"
-    }
-  },
-  // vscode-like
-  {
-    "context": "Workspace",
-    "bindings": {
-      "cmd-b": "workspace::ToggleRightDock"
-    }
-  }
+            "a": "project_panel::NewFile",
+            "A": "project_panel::NewDirectory",
+            "f": "project_panel::NewDirectory",
+            "r": "project_panel::Rename",
+            "d": "project_panel::Delete",
+            "x": "project_panel::Cut",
+            "c": "project_panel::Copy",
+            "p": "project_panel::Paste",
+
+            "ctrl-h": "workspace::ActivatePaneLeft",
+            "ctrl-l": "workspace::ActivatePaneRight",
+            "ctrl-k": "workspace::ActivatePaneUp",
+            "ctrl-j": "workspace::ActivatePaneDown",
+        },
+    },
+    // agent panel
+    {
+        "bindings": {
+            "cmd-l": "workspace::ToggleRightDock",
+        },
+    },
 ]

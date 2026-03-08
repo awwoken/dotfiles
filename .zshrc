@@ -1,12 +1,12 @@
 # Environment Variables & PATH Configuration
 export EDITOR="vim"
 
-alias mini='NVIM_APPNAME="mini-nvim" nvim'
-alias lazy='NVIM_APPNAME="lazy-nvim" nvim'
-
 # Homebrew
 export PATH=$(brew --prefix)/bin:$(brew --prefix)/sbin:$PATH
 export HOMEBREW_NO_ENV_HINTS=1
+
+# Claude Code
+export PATH="$HOME/.local/bin:$PATH"
 
 # LazyGit (git TUI)
 export XDG_CONFIG_HOME="$HOME/.config"
@@ -17,6 +17,24 @@ if [ -s "$NVM_DIR/nvm.sh" ]; then
   \. "$NVM_DIR/nvm.sh"
 fi
 
+autoload -U add-zsh-hook
+
+load-nvmrc() {
+  local node_version=$(nvm version)
+  local nvmrc_path="$(nvm_find_nvmrc)"
+
+  if [ -n "$nvmrc_path" ]; then
+    local nvmrc_node_version=$(cat "$nvmrc_path")
+
+    if [ "$nvmrc_node_version" != "$node_version" ]; then
+      nvm use --silent "$nvmrc_node_version"
+    fi
+  fi
+}
+
+add-zsh-hook chpwd load-nvmrc
+load-nvmrc
+
 # Zoxide (smart directory navigation)
 if command -v zoxide &>/dev/null; then
   eval "$(zoxide init zsh)"
@@ -24,6 +42,8 @@ if command -v zoxide &>/dev/null; then
 fi
 
 # Starship prompt (no new line after clear)
+export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
+
 if command -v starship &>/dev/null; then
   PROMPT_NEEDS_NEWLINE=false
 
@@ -98,3 +118,22 @@ alias gch="git_checkout_hard"
 # Shortcuts
 alias lg="lazygit"
 alias c="clear"
+alias n="nvim"
+
+# Yazi
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+	rm -f -- "$tmp"
+}
+
+# Android Studio
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+
+# export JAVA_HOME=$(/usr/libexec/java_home -v 17)
+export JAVA_HOME="$(brew --prefix)/opt/openjdk@17"
+

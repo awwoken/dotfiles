@@ -16,3 +16,4 @@ map("n", "<C-u>", "<C-u>zz")
 -- LSP bindings
 map("n", "<leader>d", vim.lsp.buf.hover)
 map("n", "<leader>D", vim.diagnostic.open_float)
+map("n", "<leader>rn", vim.lsp.buf.rename)

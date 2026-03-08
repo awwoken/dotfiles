@@ -1,3 +1,4 @@
 require("options")
 require("remaps")
-require("packages")
+require("plugins")
+require("theme")

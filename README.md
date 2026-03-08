@@ -14,3 +14,6 @@
 * neovim
 * lazygit
 * diff-so-fancy
+* taplo
+
+---
