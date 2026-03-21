@@ -3,5 +3,13 @@
 !.config/zed/keymap.json
 !.config/zed/settings.json
 
+# Codex
+.codex/*
+
+!.codex/skills/
+!.codex/skills/**
+
+.codex/skills/.system
+
 # macOS
 **/.DS_Store

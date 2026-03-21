@@ -1,11 +1,11 @@
 # Environment Variables & PATH Configuration
-export EDITOR="vim"
+export EDITOR="nvim"
 
 # Homebrew
 export PATH=$(brew --prefix)/bin:$(brew --prefix)/sbin:$PATH
 export HOMEBREW_NO_ENV_HINTS=1
 
-# Claude Code
+# Local bin
 export PATH="$HOME/.local/bin:$PATH"
 
 # LazyGit (git TUI)
@@ -136,4 +136,3 @@ export PATH=$PATH:$ANDROID_HOME/platform-tools
 
 # export JAVA_HOME=$(/usr/libexec/java_home -v 17)
 export JAVA_HOME="$(brew --prefix)/opt/openjdk@17"
-
