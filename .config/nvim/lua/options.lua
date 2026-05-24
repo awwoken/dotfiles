@@ -28,8 +28,8 @@ vim.opt.laststatus = 0 -- Disable status line
 -- vim.o.showmode = false -- Disable mode indicator in the command line
 vim.o.signcolumn = "yes" -- Always show the sign column
 
--- vim.opt.number = true -- Show line numbers
--- vim.opt.relativenumber = true -- Show relative line numbers
+vim.opt.number = true -- Show line numbers
+vim.opt.relativenumber = true -- Show relative line numbers
 
 vim.opt.swapfile = false -- disable swap files
 vim.opt.backup = false -- Disable backup files
@@ -51,6 +51,7 @@ if vim.fn.has("nvim-0.11") == 1 then
 end
 
 if vim.fn.has("nvim-0.12") == 1 then
+	vim.o.completeopt = "menuone,noselect,popup,fuzzy" -- Show LSP completion item previews
 	vim.o.pummaxwidth = 40 -- Limit maximum width of popup menu
 end
 

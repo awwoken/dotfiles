@@ -22,3 +22,5 @@ vim.api.nvim_create_autocmd("OptionSet", {
 	callback = adapt_theme,
 	pattern = "background",
 })
+
+adapt_theme()

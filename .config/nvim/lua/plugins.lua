@@ -1,46 +1,22 @@
-local path_package = vim.fn.stdpath("data") .. "/site"
-local mini_path = path_package .. "/pack/deps/start/mini.nvim"
+vim.pack.add({
+	-- core
+	{ src = "https://github.com/nvim-mini/mini.nvim" },
+	{ src = "https://github.com/stevearc/conform.nvim" },
 
-if not vim.loop.fs_stat(mini_path) then
-	vim.cmd('echo "Installing `mini.nvim`" | redraw')
+	-- lsp
+	{ src = "https://github.com/williamboman/mason.nvim" },
+	{ src = "https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim" },
+	{ src = "https://github.com/neovim/nvim-lspconfig" },
 
-  -- stylua: ignore
-	local clone_cmd = {
-		"git", "clone", "--filter=blob:none",
-		"https://github.com/nvim-mini/mini.nvim", mini_path
-	}
-	vim.fn.system(clone_cmd)
+	-- highlighting
+	{ src = "https://github.com/nvim-treesitter/nvim-treesitter" },
+	{ src = "https://github.com/rose-pine/neovim", name = "rose-pine" },
 
-	vim.cmd("packadd mini.nvim | helptags ALL")
-	vim.cmd('echo "Installed `mini.nvim`" | redraw')
-end
+	-- metrics
+	{ src = "https://github.com/wakatime/vim-wakatime" },
+}, { confirm = false })
 
-local MiniDeps = require("mini.deps")
-
--- core
-MiniDeps.add({ source = "echasnovski/mini.nvim" })
-MiniDeps.add({ source = "stevearc/conform.nvim" })
-
--- lsp
-MiniDeps.add({ source = "williamboman/mason.nvim" })
-MiniDeps.add({ source = "WhoIsSethDaniel/mason-tool-installer.nvim" })
-MiniDeps.add({ source = "neovim/nvim-lspconfig" })
-
--- highlighting
-MiniDeps.add({ source = "nvim-treesitter/nvim-treesitter" })
-MiniDeps.add({ source = "rose-pine/neovim" })
--- MiniDeps.add({
--- 	source = "zenbones-theme/zenbones.nvim",
--- 	depends = { "rktjmp/lush.nvim" },
--- })
--- MiniDeps.add({ source = "EdenEast/nightfox.nvim" })
-
--- metrics
-MiniDeps.add({ source = "wakatime/vim-wakatime" })
-
-MiniDeps.setup()
-
-MiniDeps.later(function()
+vim.schedule(function()
 	local Treesitter = require("nvim-treesitter")
 
 	Treesitter.setup({
@@ -60,8 +36,11 @@ MiniDeps.later(function()
 	vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
 end)
 
-MiniDeps.later(function()
+vim.schedule(function()
+	local MiniExtra = require("mini.extra")
 	local Mason = require("mason")
+
+	MiniExtra.setup()
 
 	Mason.setup({
 		ui = {
@@ -76,25 +55,32 @@ MiniDeps.later(function()
 	local MasonToolInstaller = require("mason-tool-installer")
 
 	MasonToolInstaller.setup({
-    -- stylua: ignore
-    ensure_installed = {
-      "stylua", "prettierd", "css-lsp", "html-lsp", "tailwindcss-language-server", "typescript-language-server",
-      "lua-language-server", "json-lsp", "shfmt", "clangd", "eslint-lsp", "rust-analyzer"
-    },
+		ensure_installed = {
+			"stylua",
+			"prettierd",
+			"css-lsp",
+			"html-lsp",
+			"tailwindcss-language-server",
+			"typescript-language-server",
+			"lua-language-server",
+			"json-lsp",
+			"shfmt",
+			"clangd",
+			"eslint-lsp",
+			"rust-analyzer",
+			"taplo",
+		},
 		auto_update = true,
 	})
-
-  -- stylua: ignore
-  vim.lsp.enable({
-    "lua_ls", "ts_ls", "tailwindcss", "cssls", "html", "jsonls", "clangd", "rust_analyzer"
-  })
 
 	vim.lsp.config("ts_ls", { -- prioritize git marker to share one lsp through monorepo
 		root_markers = { ".git", "tsconfig.json", "jsconfig.json", "package.json" },
 	})
 
-	vim.lsp.config("eslint-lsp", { -- pick correct configuration file in monorepo
-		workingDirectory = { mode = "location" },
+	vim.lsp.config("eslint", { -- pick correct configuration file in monorepo
+		settings = {
+			workingDirectory = { mode = "location" },
+		},
 	})
 
 	vim.lsp.config("clangd", {
@@ -113,45 +99,6 @@ MiniDeps.later(function()
 			},
 		},
 	})
-end)
-
-MiniDeps.later(function()
-	local MiniCompletion = require("mini.completion")
-
-	-- Don't show 'Text' suggestions
-	local process_items_opts = { kind_priority = { Text = -1 } }
-	local process_items = function(items, base)
-		return MiniCompletion.default_process_items(items, base, process_items_opts)
-	end
-
-	MiniCompletion.setup({
-		lsp_completion = {
-			process_items = process_items,
-			source_func = "omnifunc",
-			auto_setup = false,
-		},
-		fallback_action = function() end,
-	})
-
-	-- Set up LSP part of completion
-	local on_attach = function(args)
-		vim.bo[args.buf].omnifunc = "v:lua.MiniCompletion.completefunc_lsp"
-	end
-	vim.api.nvim_create_autocmd("LspAttach", { callback = on_attach })
-
-	vim.lsp.config("*", {
-		capabilities = MiniCompletion.get_lsp_capabilities(),
-	})
-
-	-- Bind C-j and C-k to move up and down
-	vim.keymap.set("i", "<C-j>", [[pumvisible() ? "\<C-n>" : "\<C-j>"]], { expr = true })
-	vim.keymap.set("i", "<C-k>", [[pumvisible() ? "\<C-p>" : "\<C-k>"]], { expr = true })
-end)
-
-MiniDeps.later(function()
-	local MiniExtra = require("mini.extra")
-
-	MiniExtra.setup()
 
 	local extraMap = function(lhs, rhs, buf)
 		vim.keymap.set("n", lhs, rhs, { buffer = buf, silent = true, nowait = true })
@@ -159,6 +106,12 @@ MiniDeps.later(function()
 
 	vim.api.nvim_create_autocmd("LspAttach", {
 		callback = function(args)
+			local client = vim.lsp.get_client_by_id(args.data.client_id)
+
+			if client ~= nil and client:supports_method("textDocument/completion") then
+				vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
+			end
+
 			extraMap("gd", function()
 				MiniExtra.pickers.lsp({ scope = "definition" })
 			end, args.buf)
@@ -171,9 +124,29 @@ MiniDeps.later(function()
 		end,
 		group = vim.api.nvim_create_augroup("UserLspConfig", {}),
 	})
+
+	vim.keymap.set("i", "<C-Space>", function()
+		vim.lsp.completion.get()
+	end, { silent = true })
+
+	-- Bind C-j and C-k to move up and down
+	vim.keymap.set("i", "<C-j>", [[pumvisible() ? "\<C-n>" : "\<C-j>"]], { expr = true })
+	vim.keymap.set("i", "<C-k>", [[pumvisible() ? "\<C-p>" : "\<C-k>"]], { expr = true })
+
+	vim.lsp.enable({
+		"lua_ls",
+		"ts_ls",
+		"tailwindcss",
+		"cssls",
+		"html",
+		"jsonls",
+		"clangd",
+		"rust_analyzer",
+		"eslint",
+	})
 end)
 
-MiniDeps.later(function()
+vim.schedule(function()
 	local Conform = require("conform")
 
 	Conform.setup({
@@ -202,7 +175,7 @@ MiniDeps.later(function()
 	end, { silent = true })
 end)
 
-MiniDeps.later(function()
+vim.schedule(function()
 	local MiniFiles = require("mini.files")
 
 	vim.keymap.set("n", "<leader>e", function()
@@ -235,7 +208,7 @@ MiniDeps.later(function()
 	})
 end)
 
-MiniDeps.later(function()
+vim.schedule(function()
 	local MiniPick = require("mini.pick")
 
 	MiniPick.setup({
@@ -258,7 +231,7 @@ MiniDeps.later(function()
 	end, { silent = true, noremap = true })
 end)
 
-MiniDeps.later(function()
+vim.schedule(function()
 	local MiniMove = require("mini.move")
 
 	MiniMove.setup({
