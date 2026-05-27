@@ -109,6 +109,7 @@
 
       "a": "project_panel::NewFile",
       "A": "project_panel::NewDirectory",
+      "f": "project_panel::NewDirectory",
       "r": "project_panel::Rename",
       "d": "project_panel::Delete",
       "x": "project_panel::Cut",

@@ -1,7 +1,46 @@
 {
   // appearance & theme
+  "show_edit_predictions": false,
+  "cli_default_open_behavior": "new_window",
+  "outline_panel": {
+    "dock": "left",
+  },
+  "collaboration_panel": {
+    "dock": "left",
+  },
+  "agent": {
+    "enable_feedback": false,
+    "default_profile": "ask",
+    "default_model": {
+      "provider": "openai-subscribed",
+      "model": "gpt-5.4",
+      "enable_thinking": true,
+      "effort": "medium"
+    },
+    "dock": "right",
+    "favorite_models": [],
+    "model_parameters": [],
+  },
+  "lsp": {
+    "vtsls": {
+      "settings": {
+        "typescript": {
+          "updateImportsOnFileMove": {
+            "enabled": "always",
+          },
+        },
+        "javascript": {
+          "updateImportsOnFileMove": {
+            "enabled": "always",
+          },
+        },
+      },
+      "enable_lsp_tasks": true,
+    },
+  },
   "git_panel": {
-    "tree_view": true
+    "dock": "left",
+    "tree_view": true,
   },
   "minimum_contrast_for_highlights": 45.0,
   "text_rendering_mode": "platform_default",
@@ -9,23 +48,31 @@
     "light": "One Light",
     "dark": "One Dark",
   },
-  "icon_theme": "Zed (Default)",
+  "icon_theme": {
+    "mode": "light",
+    "light": "Zed (Default)",
+    "dark": "Zed (Default)",
+  },
   "colorize_brackets": true,
   "rounded_selection": true,
   "show_wrap_guides": true,
 
   // ai assistant
-  "disable_ai": false,
-  "agent_servers": {
-    "codex-acp": {
-      "type": "registry",
-    },
-  },
-  "use_system_prompts": true,
-  "use_system_path_prompts": true,
+  "disable_ai": true,
+  // "agent_servers": {
+  //   "codex-acp": {
+  //     "type": "registry",
+  //   },
+  // },
+  // "show_edit_predictions": false,
+  // "use_system_prompts": true,
+  // "use_system_path_prompts": true,
 
   // editor behavior
   "vim_mode": true,
+  "vim": {
+    "use_system_clipboard": "always",
+  },
   "relative_line_numbers": "enabled",
   "redact_private_values": false,
   "auto_indent": "syntax_aware",
@@ -92,12 +139,14 @@
 
   // panels & tools
   "project_panel": {
+    "dock": "left",
     "button": true,
     "auto_fold_dirs": false,
     "sticky_scroll": false,
     "indent_size": 12,
   },
   "terminal": {
+    "shell": "system",
     "button": true,
   },
   "search": {
@@ -113,6 +162,9 @@
     "inline": {
       "enabled": true,
     },
+  },
+  "edit_predictions": {
+    "mode": "subtle",
   },
 
   // language specific
