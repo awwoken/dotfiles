@@ -1,0 +1,4 @@
+font-size = 20
+theme = One Dark
+scrollback-limit = 50000000
+split-divider-color = #3e4451

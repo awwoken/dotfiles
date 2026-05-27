@@ -1,10 +1,21 @@
 add_newline = false
+format = "$sudo$directory$git_branch$character"
 
-format = """
-$directory\
-$git_branch\
-$git_state\
-$sudo\
-$container\
-$nodejs\
-$character"""
+[directory]
+truncation_length = 2
+truncate_to_repo = true
+
+[git_branch]
+symbol = ""
+format = "[$branch]($style) "
+
+[sudo]
+disabled = false
+symbol = "sudo"
+format = "[$symbol]($style) "
+style = "bold red"
+
+[character]
+success_symbol = '\$'
+error_symbol = '\$'
+vimcmd_symbol = '\$'
