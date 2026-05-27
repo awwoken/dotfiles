@@ -1,7 +1,27 @@
+vim.api.nvim_create_autocmd("PackChanged", {
+	callback = function(ev)
+		local name, kind = ev.data.spec.name, ev.data.kind
+
+		if name == "fff.nvim" and (kind == "install" or kind == "update") then
+			if not ev.data.active then
+				vim.cmd.packadd("fff.nvim")
+			end
+
+			require("fff.download").download_or_build_binary()
+		end
+	end,
+})
+
+vim.g.fff = {
+	lazy_sync = true,
+}
+
 vim.pack.add({
 	-- core
 	{ src = "https://github.com/nvim-mini/mini.nvim" },
 	{ src = "https://github.com/stevearc/conform.nvim" },
+	{ src = "https://github.com/dmtrKovalenko/fff.nvim" },
+	{ src = "https://github.com/Saghen/blink.cmp", version = vim.version.range("1") },
 
 	-- lsp
 	{ src = "https://github.com/williamboman/mason.nvim" },
@@ -10,11 +30,33 @@ vim.pack.add({
 
 	-- highlighting
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter" },
-	{ src = "https://github.com/rose-pine/neovim", name = "rose-pine" },
+	{ src = "https://github.com/navarasu/onedark.nvim" },
 
 	-- metrics
 	{ src = "https://github.com/wakatime/vim-wakatime" },
 }, { confirm = false })
+
+require("blink.cmp").setup({
+	keymap = {
+		preset = "default",
+		["<C-j>"] = { "select_next", "fallback" },
+		["<C-k>"] = { "select_prev", "fallback" },
+	},
+	completion = {
+		documentation = {
+			auto_show = true,
+			auto_show_delay_ms = 500,
+			window = { border = "none" },
+		},
+		menu = { border = "none" },
+	},
+	sources = {
+		default = { "lsp", "path", "snippets", "buffer" },
+	},
+	fuzzy = {
+		implementation = "rust",
+	},
+})
 
 vim.schedule(function()
 	local Treesitter = require("nvim-treesitter")
@@ -23,7 +65,7 @@ vim.schedule(function()
     --stylua: ignore
 		ensure_installed = {
 			"c", "cpp", "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline", "vue", "graphql",
-      "regex", "bash", "html", "css", "rust", "javascript", "typescript", "tsx", "json",
+      "regex", "bash", "html", "css", "rust", "javascript", "typescript", "tsx", "json", "yaml", "prisma",
     },
 		highlight = {
 			disable = function(_, bufnr)
@@ -64,13 +106,19 @@ vim.schedule(function()
 			"typescript-language-server",
 			"lua-language-server",
 			"json-lsp",
+			"prisma-language-server",
 			"shfmt",
 			"clangd",
 			"eslint-lsp",
+			"oxlint",
 			"rust-analyzer",
 			"taplo",
 		},
 		auto_update = true,
+	})
+
+	vim.lsp.config("*", {
+		capabilities = require("blink.cmp").get_lsp_capabilities(),
 	})
 
 	vim.lsp.config("ts_ls", { -- prioritize git marker to share one lsp through monorepo
@@ -80,6 +128,31 @@ vim.schedule(function()
 	vim.lsp.config("eslint", { -- pick correct configuration file in monorepo
 		settings = {
 			workingDirectory = { mode = "location" },
+		},
+	})
+
+	vim.lsp.config("oxlint", {
+		root_dir = function(bufnr, on_dir)
+			local root = vim.fs.root(bufnr, {
+				{ ".oxlintrc.json", ".oxlintrc.jsonc", "oxlint.config.ts" },
+				function(name, path)
+					if name ~= "package.json" then
+						return false
+					end
+
+					local ok, lines = pcall(vim.fn.readfile, vim.fs.joinpath(path, name))
+					local content = ok and table.concat(lines, "\n") or ""
+
+					return content:find('"oxlint"', 1, true) or content:find('"vite-plus"', 1, true)
+				end,
+			})
+
+			if root then
+				on_dir(root)
+			end
+		end,
+		settings = {
+			run = "onType",
 		},
 	})
 
@@ -106,12 +179,6 @@ vim.schedule(function()
 
 	vim.api.nvim_create_autocmd("LspAttach", {
 		callback = function(args)
-			local client = vim.lsp.get_client_by_id(args.data.client_id)
-
-			if client ~= nil and client:supports_method("textDocument/completion") then
-				vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
-			end
-
 			extraMap("gd", function()
 				MiniExtra.pickers.lsp({ scope = "definition" })
 			end, args.buf)
@@ -125,14 +192,6 @@ vim.schedule(function()
 		group = vim.api.nvim_create_augroup("UserLspConfig", {}),
 	})
 
-	vim.keymap.set("i", "<C-Space>", function()
-		vim.lsp.completion.get()
-	end, { silent = true })
-
-	-- Bind C-j and C-k to move up and down
-	vim.keymap.set("i", "<C-j>", [[pumvisible() ? "\<C-n>" : "\<C-j>"]], { expr = true })
-	vim.keymap.set("i", "<C-k>", [[pumvisible() ? "\<C-p>" : "\<C-k>"]], { expr = true })
-
 	vim.lsp.enable({
 		"lua_ls",
 		"ts_ls",
@@ -140,9 +199,11 @@ vim.schedule(function()
 		"cssls",
 		"html",
 		"jsonls",
+		"prismals",
 		"clangd",
 		"rust_analyzer",
 		"eslint",
+		"oxlint",
 	})
 end)
 
@@ -223,11 +284,11 @@ vim.schedule(function()
 	vim.ui.select = MiniPick.ui_select
 
 	vim.keymap.set("n", "<leader>ff", function()
-		MiniPick.builtin.files({ tool = "fd" })
+		require("fff").find_files()
 	end, { silent = true, noremap = true })
 
 	vim.keymap.set("n", "<leader>fg", function()
-		MiniPick.builtin.grep_live({ tool = "rg" })
+		require("fff").live_grep()
 	end, { silent = true, noremap = true })
 end)
 

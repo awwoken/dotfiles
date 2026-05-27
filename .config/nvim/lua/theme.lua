@@ -1,7 +1,11 @@
 vim.cmd("colorscheme " .. "vim") -- Prevents flash before system theme set
 
 local function adapt_theme()
-	vim.cmd("colorscheme " .. (vim.o.background == "dark" and "rose-pine" or "rose-pine-dawn"))
+	require("onedark").setup({
+		style = vim.o.background == "light" and "light" or "dark",
+		transparent = true,
+	})
+	require("onedark").load()
 
 	local groups = {
 		"Normal",
