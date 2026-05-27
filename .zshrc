@@ -8,6 +8,9 @@ export HOMEBREW_NO_ENV_HINTS=1
 # Local bin
 export PATH="$HOME/.local/bin:$PATH"
 
+# Bun
+export PATH="/Users/andromeda/.bun/bin:$PATH"
+
 # LazyGit (git TUI)
 export XDG_CONFIG_HOME="$HOME/.config"
 
@@ -94,7 +97,7 @@ alias ga="git_add"
 git_commit_message() {
   git commit --message "$*"
 }
-alias gcm="git_commit_message"
+alias gcm="noglob git_commit_message"
 
 git_soft_reset_copy() {
   msg="$(git log -1 --pretty=%B | sed '$d')"
@@ -129,6 +132,11 @@ function y() {
 	rm -f -- "$tmp"
 }
 
+# Handle brackets
+for cmd in sed cat rg bat; do
+  eval "$cmd() { noglob command $cmd \"\$@\" }"
+done
+
 # Android Studio
 export ANDROID_HOME=$HOME/Library/Android/sdk
 export PATH=$PATH:$ANDROID_HOME/emulator
@@ -136,3 +144,10 @@ export PATH=$PATH:$ANDROID_HOME/platform-tools
 
 # export JAVA_HOME=$(/usr/libexec/java_home -v 17)
 export JAVA_HOME="$(brew --prefix)/opt/openjdk@17"
+
+# OpenClaw Completion
+source "/Users/andromeda/.openclaw/completions/openclaw.zsh"
+
+export DOCKER_CLI_HINTS=false
+
+
