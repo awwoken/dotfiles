@@ -1,0 +1,8 @@
+require("plugins.completion")
+require("plugins.treesitter")
+require("plugins.mini")
+require("plugins.lsp")
+require("plugins.formatting")
+require("plugins.neo-tree")
+require("plugins.picker")
+require("plugins.metrics")

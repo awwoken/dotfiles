@@ -1,3 +1,7 @@
+vim.pack.add({
+	{ src = "https://github.com/navarasu/onedark.nvim" },
+}, { confirm = false })
+
 vim.cmd("colorscheme " .. "vim") -- Prevents flash before system theme set
 
 local function adapt_theme()
