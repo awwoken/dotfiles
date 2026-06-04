@@ -1,0 +1,24 @@
+{
+  "defaultModel": "gpt-5.5",
+  "defaultProvider": "openai-codex",
+  "defaultThinkingLevel": "high",
+  "lastChangelogVersion": "0.78.0",
+  "collapseChangelog": true,
+  "packages": [
+    {
+      "source": "npm:pi-mcp-adapter"
+    },
+    {
+      "source": "npm:context-mode",
+      "skills": [
+        "context-mode"
+      ]
+    },
+    {
+      "source": "npm:@upstash/context7-pi",
+      "skills": [],
+      "prompts": []
+    }
+  ],
+  "theme": "mono-ink"
+}
