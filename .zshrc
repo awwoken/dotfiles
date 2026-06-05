@@ -9,7 +9,7 @@ export HOMEBREW_NO_ENV_HINTS=1
 export PATH="$HOME/.local/bin:$PATH"
 
 # Bun
-# export PATH="/Users/andromeda/.bun/bin:$PATH"
+export PATH="$HOME/.bun/bin:$PATH"
 
 # LazyGit (git TUI)
 export XDG_CONFIG_HOME="$HOME/.config"
@@ -37,71 +37,9 @@ load-nvmrc() {
 add-zsh-hook chpwd load-nvmrc
 load-nvmrc
 
-# Pi coding agent. Installs/runs Pi using the Node version required by the Pi npm package.
+# Pi coding agent runner.
 pi() {
-  local pi_package="@earendil-works/pi-coding-agent"
-  local pi_cmd="pi"
-
-  if [[ ! $(type nvm 2>/dev/null) ]]; then
-    echo "nvm is required to install/run Pi's required Node runtime" >&2
-    return 127
-  fi
-
-  local node_engine node_version node_bin npm_bin node_prefix pi_shim pi_cli
-
-  node_engine="$(npm view "$pi_package" engines.node --silent 2>/dev/null)" || {
-    echo "Could not read Pi's required Node version from npm" >&2
-    return 1
-  }
-
-  node_version="$(printf '%s\n' "$node_engine" | sed -nE 's/.*>= ?v?([0-9]+(\.[0-9]+){0,2}).*/\1/p')"
-
-  if [[ -z "$node_version" ]]; then
-    echo "Could not parse Pi's required Node version: $node_engine" >&2
-    return 1
-  fi
-
-  node_bin="$(nvm which "$node_version" 2>/dev/null)"
-
-  if [[ "$node_bin" == "N/A" || ! -x "$node_bin" ]]; then
-    (
-      nvm install "$node_version"
-    ) || return
-  
-    node_bin="$(nvm which "$node_version" 2>/dev/null)" || return
-  fi
-
-  npm_bin="${node_bin:h}/npm"
-  node_prefix="$("$npm_bin" prefix -g 2>/dev/null)" || return
-  pi_shim="$node_prefix/bin/$pi_cmd"
-
-  if [[ ! -x "$pi_shim" ]]; then
-    "$npm_bin" install -g \
-      --ignore-scripts \
-      --min-release-age=0 \
-      --no-fund \
-      --no-audit \
-      "$pi_package" || return
-  fi
-
-  pi_cli="$pi_shim"
-
-  if [[ -L "$pi_cli" ]]; then
-    local target
-    target="$(readlink "$pi_cli")"
-    [[ "$target" == /* ]] && pi_cli="$target" || pi_cli="${pi_cli:h}/$target"
-  fi
-
-  local pi_cli_dir
-  pi_cli_dir="${pi_cli:h:A}" || return
-  pi_cli="$pi_cli_dir/${pi_cli:t}"
-
-  if [[ ! -f "$pi_cli" ]]; then
-    echo "pi CLI not found at $pi_cli" >&2
-    return 127
-  fi
-
-  "$node_bin" "$pi_cli" "$@"
+  "$HOME/.pi/run.sh" "$@"
 }
 
 # Zoxide (smart directory navigation)
