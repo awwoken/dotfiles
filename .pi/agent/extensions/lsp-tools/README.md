@@ -1,4 +1,4 @@
-# LSP Tools Extension
+# lsp-tools
 
 Pi extension that exposes focused semantic code-navigation tools backed by local Language Server Protocol servers.
 
