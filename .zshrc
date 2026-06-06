@@ -5,6 +5,8 @@ export EDITOR="nvim"
 export PATH=$(brew --prefix)/bin:$(brew --prefix)/sbin:$PATH
 export HOMEBREW_NO_ENV_HINTS=1
 
+export PATH="$HOME/.cargo/bin:$PATH"
+
 # Local bin
 export PATH="$HOME/.local/bin:$PATH"
 
