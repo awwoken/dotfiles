@@ -11,9 +11,10 @@ import {
   ExitNotification,
   InitializedNotification,
   InitializeRequest,
+  PublishDiagnosticsNotification,
   ShutdownRequest,
 } from "vscode-languageserver-protocol"
-import type { InitializeResult, ServerCapabilities } from "vscode-languageserver-protocol"
+import type { Diagnostic, InitializeResult, ServerCapabilities } from "vscode-languageserver-protocol"
 
 import { resolveServerForFile } from "./config.ts"
 import type { OpenDocumentState, PositionEncoding, ResolvedLspServer } from "./types.ts"
@@ -53,6 +54,7 @@ export class LspClient {
   private stopped = false
   private stderr = ""
   private documents = new Map<string, OpenDocumentState>()
+  private publishedDiagnostics = new Map<string, Diagnostic[]>()
   private serverCapabilities?: ServerCapabilities
   private negotiatedPositionEncoding: PositionEncoding = "utf-16"
 
@@ -122,6 +124,25 @@ export class LspClient {
     return pathToFileUri(filePath)
   }
 
+  getPublishedDiagnostics(filePath: string): Diagnostic[] | undefined {
+    return this.publishedDiagnostics.get(pathToFileUri(path.resolve(filePath)))
+  }
+
+  async waitForPublishedDiagnostics(filePath: string, timeoutMs = 1_000): Promise<Diagnostic[] | undefined> {
+    const uri = pathToFileUri(path.resolve(filePath))
+    const existing = this.publishedDiagnostics.get(uri)
+    if (existing) return existing
+
+    const startedAt = Date.now()
+    while (Date.now() - startedAt < timeoutMs) {
+      await new Promise((resolve) => setTimeout(resolve, 50))
+      const diagnostics = this.publishedDiagnostics.get(uri)
+      if (diagnostics) return diagnostics
+    }
+
+    return undefined
+  }
+
   async sendRequest<R>(type: { method: string }, params: unknown, signal?: AbortSignal, timeoutMs = DEFAULT_TIMEOUT_MS): Promise<R> {
     await this.ensureStarted(signal, timeoutMs)
     return this.request<R>(type, params, signal, timeoutMs)
@@ -143,6 +164,7 @@ export class LspClient {
     this.process = undefined
     this.serverCapabilities = undefined
     this.documents.clear()
+    this.publishedDiagnostics.clear()
 
     if (!connection || !child || child.exitCode !== null) {
       connection?.dispose()
@@ -187,6 +209,7 @@ export class LspClient {
       this.connection = undefined
       this.serverCapabilities = undefined
       this.documents.clear()
+      this.publishedDiagnostics.clear()
       this.onExit()
     })
 
@@ -197,6 +220,9 @@ export class LspClient {
     const connection = createMessageConnection(new StreamMessageReader(child.stdout), new StreamMessageWriter(child.stdin))
     this.connection = connection
     this.registerClientRequestHandlers(connection)
+    connection.onNotification(PublishDiagnosticsNotification.type, (params) => {
+      this.publishedDiagnostics.set(params.uri, params.diagnostics)
+    })
     connection.listen()
 
     const initializeResult = await this.requestWithConnection(
@@ -222,6 +248,12 @@ export class LspClient {
             },
             documentSymbol: {
               hierarchicalDocumentSymbolSupport: true,
+            },
+            diagnostic: {
+              relatedDocumentSupport: false,
+            },
+            publishDiagnostics: {
+              relatedInformation: true,
             },
             references: {},
           },

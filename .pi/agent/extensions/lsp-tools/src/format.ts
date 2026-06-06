@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs"
 import path from "node:path"
 
-import type { DocumentSymbol, Hover, Location, LocationLink, MarkedString, MarkupContent, SymbolInformation, WorkspaceSymbol } from "vscode-languageserver-protocol"
+import type { Diagnostic, DocumentSymbol, Hover, Location, LocationLink, MarkedString, MarkupContent, SymbolInformation, WorkspaceSymbol } from "vscode-languageserver-protocol"
 
 import { fileUriToPath, isPathInside } from "./uri.ts"
 
@@ -9,6 +9,7 @@ const REFERENCE_LIMIT = 80
 const DEFINITION_LIMIT = 20
 const SYMBOL_LIMIT = 200
 const WORKSPACE_SYMBOL_LIMIT = 100
+const DIAGNOSTIC_LIMIT = 100
 const HOVER_MAX_CHARS = 4_000
 
 const SYMBOL_KINDS: Record<number, string> = {
@@ -54,6 +55,17 @@ export async function formatTypeDefinitions(result: Location | Location[] | Loca
 
 export async function formatImplementations(result: Location | Location[] | LocationLink[] | null | undefined, cwd: string): Promise<string> {
   return formatLocationResult("Implementations", result, cwd)
+}
+
+export function formatDiagnostics(diagnostics: Diagnostic[] | null | undefined, cwd: string, filePath: string): string {
+  const items = diagnostics ?? []
+  if (items.length === 0) return "Diagnostics: no diagnostics returned by the language server."
+
+  const displayPath = displayPathFor(cwd, filePath)
+  const shown = items.slice(0, DIAGNOSTIC_LIMIT)
+  const lines = shown.map((diagnostic) => formatDiagnostic(diagnostic, displayPath))
+  const suffix = items.length > shown.length ? `\n... truncated ${items.length - shown.length} additional diagnostic(s)` : ""
+  return `Diagnostics (${shown.length}${items.length > shown.length ? ` of ${items.length}` : ""}):\n${lines.join("\n")}${suffix}`
 }
 
 export function formatHover(result: Hover | null | undefined): string {
@@ -105,6 +117,34 @@ function formatLocations(title: string, locations: Location[], cwd: string, limi
   const lines = shown.map((location) => formatLocation(location, cwd, includePreview))
   const suffix = locations.length > shown.length ? `\n... truncated ${locations.length - shown.length} additional location(s)` : ""
   return `${title} (${shown.length}${locations.length > shown.length ? ` of ${locations.length}` : ""}):\n${lines.join("\n")}${suffix}`
+}
+
+function formatDiagnostic(diagnostic: Diagnostic, displayPath: string): string {
+  const line = diagnostic.range.start.line + 1
+  const column = diagnostic.range.start.character + 1
+  const severity = diagnosticSeverityName(diagnostic.severity)
+  const source = diagnostic.source ? `${diagnostic.source}` : undefined
+  const code = diagnostic.code !== undefined ? `${diagnostic.code}` : undefined
+  const label = [source, code].filter(Boolean).join(" ")
+  const suffix = label ? ` ${label}` : ""
+  const messageText = typeof diagnostic.message === "string" ? diagnostic.message : diagnostic.message.value
+  const message = messageText.replace(/\s+/gu, " ").trim()
+  return `- ${displayPath}:${line}:${column} ${severity}${suffix} — ${message}`
+}
+
+function diagnosticSeverityName(severity: Diagnostic["severity"]): string {
+  switch (severity) {
+    case 1:
+      return "error"
+    case 2:
+      return "warning"
+    case 3:
+      return "information"
+    case 4:
+      return "hint"
+    default:
+      return "diagnostic"
+  }
 }
 
 function formatHoverContents(contents: Hover["contents"]): string {

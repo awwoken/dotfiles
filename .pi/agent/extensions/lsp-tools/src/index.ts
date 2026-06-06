@@ -1,69 +1,21 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent"
-import { Type } from "typebox"
-import { DefinitionRequest, DocumentSymbolRequest, HoverRequest, ImplementationRequest, ReferencesRequest, TypeDefinitionRequest, WorkspaceSymbolRequest } from "vscode-languageserver-protocol"
-import type { DocumentSymbol, Hover, Location, LocationLink, SymbolInformation, WorkspaceSymbol } from "vscode-languageserver-protocol"
+import { DefinitionRequest, DocumentDiagnosticRequest, DocumentSymbolRequest, HoverRequest, ImplementationRequest, ReferencesRequest, TypeDefinitionRequest, WorkspaceSymbolRequest } from "vscode-languageserver-protocol"
+import type { Diagnostic, DocumentDiagnosticReport, DocumentSymbol, Hover, Location, LocationLink, SymbolInformation, WorkspaceSymbol } from "vscode-languageserver-protocol"
 
 import { LspClientManager } from "./client.ts"
-import { formatDefinitions, formatDocumentSymbols, formatHover, formatImplementations, formatReferences, formatTypeDefinitions, formatWorkspaceSymbols } from "./format.ts"
+import { formatDefinitions, formatDiagnostics, formatDocumentSymbols, formatHover, formatImplementations, formatReferences, formatTypeDefinitions, formatWorkspaceSymbols } from "./format.ts"
 import { resolveSymbolPosition } from "./position.ts"
-
-const DEFAULT_TIMEOUT_MS = 30_000
-const MIN_TIMEOUT_MS = 1_000
-const MAX_TIMEOUT_MS = 120_000
-
-const FileParam = Type.String({ description: "Path to the target file, relative to the current workspace or absolute inside it" })
-const WorkspaceFileParam = Type.String({ description: "Path to any file in the target workspace, used to select the local language server" })
-const LineParam = Type.Number({ description: "1-indexed source line containing the symbol" })
-const SymbolParam = Type.String({ description: "Exact symbol text on the target line. Use suffix like foo#2 for repeated occurrences on one line." })
-const TimeoutParam = Type.Optional(Type.Number({ description: "Request timeout in milliseconds (default: 30000, max: 120000)", default: DEFAULT_TIMEOUT_MS }))
-
-const DocumentSymbolsParams = Type.Object({
-  file: FileParam,
-  query: Type.Optional(Type.String({ description: "Optional case-insensitive substring filter for returned symbols" })),
-  timeout: TimeoutParam,
-})
-
-const DefinitionParams = Type.Object({
-  file: FileParam,
-  line: LineParam,
-  symbol: SymbolParam,
-  timeout: TimeoutParam,
-})
-
-const ReferencesParams = Type.Object({
-  file: FileParam,
-  line: LineParam,
-  symbol: SymbolParam,
-  includeDeclaration: Type.Optional(Type.Boolean({ description: "Include the symbol declaration in results (default: true)", default: true })),
-  timeout: TimeoutParam,
-})
-
-const HoverParams = Type.Object({
-  file: FileParam,
-  line: LineParam,
-  symbol: SymbolParam,
-  timeout: TimeoutParam,
-})
-
-const WorkspaceSymbolsParams = Type.Object({
-  file: WorkspaceFileParam,
-  query: Type.String({ description: "Workspace symbol query to send to the language server" }),
-  timeout: TimeoutParam,
-})
-
-const TypeDefinitionParams = Type.Object({
-  file: FileParam,
-  line: LineParam,
-  symbol: SymbolParam,
-  timeout: TimeoutParam,
-})
-
-const ImplementationParams = Type.Object({
-  file: FileParam,
-  line: LineParam,
-  symbol: SymbolParam,
-  timeout: TimeoutParam,
-})
+import {
+  DefinitionParams,
+  DiagnosticsParams,
+  DocumentSymbolsParams,
+  HoverParams,
+  ImplementationParams,
+  ReferencesParams,
+  TypeDefinitionParams,
+  WorkspaceSymbolsParams,
+} from "./schemas.ts"
+import { assertCapability, diagnosticsFromDocumentReport, normalizeTimeout } from "./utils.ts"
 
 export default function lspToolsExtension(pi: ExtensionAPI) {
   const manager = new LspClientManager()
@@ -93,6 +45,51 @@ export default function lspToolsExtension(pi: ExtensionAPI) {
       )
 
       const text = formatDocumentSymbols(result, resolution.cwd, params.query)
+      return {
+        content: [{ type: "text" as const, text }],
+        details: {
+          serverName: resolution.serverName,
+          workspaceRoot: resolution.workspaceRoot,
+          file: resolution.targetFilePath,
+        },
+      }
+    },
+  })
+
+  pi.registerTool({
+    name: "lsp_diagnostics",
+    label: "LSP Diagnostics",
+    description: "Use when you need semantic errors or warnings for a source file. Returns diagnostics from the local language server.",
+    promptSnippet: "Show language-server diagnostics for a source file.",
+    promptGuidelines: ["Use lsp_diagnostics to inspect type errors, syntax errors, and warnings before or after code edits."],
+    parameters: DiagnosticsParams,
+    async execute(_toolCallId, params, signal, _onUpdate, ctx) {
+      const timeout = normalizeTimeout(params.timeout)
+      const { client, resolution } = await manager.getClientForFile(ctx.cwd, params.file)
+
+      await client.ensureStarted(signal, timeout)
+      await client.ensureFileOpen(resolution.targetFilePath)
+
+      let diagnostics: Diagnostic[] | undefined
+      if (client.capabilities?.diagnosticProvider) {
+        const result = await client.sendRequest<DocumentDiagnosticReport>(
+          DocumentDiagnosticRequest.type,
+          {
+            textDocument: { uri: client.documentUri(resolution.targetFilePath) },
+          },
+          signal,
+          timeout,
+        )
+        diagnostics = diagnosticsFromDocumentReport(result) ?? client.getPublishedDiagnostics(resolution.targetFilePath)
+      } else {
+        diagnostics = await client.waitForPublishedDiagnostics(resolution.targetFilePath, Math.min(timeout, 1_000))
+      }
+
+      if (!diagnostics) {
+        throw new Error("LSP diagnostics unsupported by server: expected textDocument/diagnostic support or textDocument/publishDiagnostics notifications")
+      }
+
+      const text = formatDiagnostics(diagnostics, resolution.cwd, resolution.targetFilePath)
       return {
         content: [{ type: "text" as const, text }],
         details: {
@@ -348,16 +345,3 @@ export default function lspToolsExtension(pi: ExtensionAPI) {
   })
 }
 
-function assertCapability(value: unknown, method: string): void {
-  if (!value) {
-    throw new Error(`LSP method unsupported by server: ${method}`)
-  }
-}
-
-function normalizeTimeout(value: number | undefined): number {
-  if (value === undefined) return DEFAULT_TIMEOUT_MS
-  if (!Number.isFinite(value) || value < MIN_TIMEOUT_MS) {
-    throw new Error(`Timeout must be at least ${MIN_TIMEOUT_MS}ms`)
-  }
-  return Math.min(Math.floor(value), MAX_TIMEOUT_MS)
-}

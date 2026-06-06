@@ -5,6 +5,7 @@ Pi extension that exposes focused semantic code-navigation tools backed by local
 ## Tools
 
 - `lsp_document_symbols` — list semantic symbols in a file.
+- `lsp_diagnostics` — show semantic errors and warnings for a file.
 - `lsp_go_to_definition` — find the definition of a symbol at a specific line.
 - `lsp_find_references` — find semantic references for a symbol at a specific line.
 - `lsp_hover` — show type, signature, or documentation details for a symbol.
@@ -126,6 +127,10 @@ Set `disabled: true` on a server to disable it.
 
 ```text
 Use lsp_document_symbols on src/index.ts
+```
+
+```text
+Use lsp_diagnostics on src/index.ts
 ```
 
 ```text
