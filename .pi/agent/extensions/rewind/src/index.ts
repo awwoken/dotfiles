@@ -16,7 +16,9 @@ function extractTextFromUserMessage(message: UserMessage): string {
     .join("")
 }
 
-function findLastUserMessage(entries: SessionEntry[]): RewindTarget | undefined {
+function findNthPreviousUserMessage(entries: SessionEntry[], count: number): RewindTarget | undefined {
+  let matches = 0
+
   for (let index = entries.length - 1; index >= 0; index -= 1) {
     const entry = entries[index]
     if (entry.type !== "message") continue
@@ -25,24 +27,42 @@ function findLastUserMessage(entries: SessionEntry[]): RewindTarget | undefined 
     const text = extractTextFromUserMessage(entry.message)
     if (!text.trim()) continue
 
-    return { id: entry.id, text }
+    matches += 1
+    if (matches === count) return { id: entry.id, text }
   }
 
   return undefined
 }
 
+function parseRewindCount(args: string): number | undefined {
+  const value = args.trim()
+  if (!value) return 1
+  if (!/^\d+$/.test(value)) return undefined
+
+  const count = Number(value)
+  if (!Number.isSafeInteger(count) || count < 1) return undefined
+
+  return count
+}
+
 export default function rewindExtension(pi: ExtensionAPI): void {
   pi.registerCommand("rewind", {
-    description: "Cancel the current agent stream and edit the last user message",
-    handler: async (_args, ctx) => {
+    description: "Cancel the current agent stream and edit a previous user message",
+    handler: async (args, ctx) => {
+      const count = parseRewindCount(args)
+      if (!count) {
+        ctx.ui.notify("Usage: /rewind [positive-message-count]", "warning")
+        return
+      }
+
       if (!ctx.isIdle()) {
         ctx.abort()
         await ctx.waitForIdle()
       }
 
-      const target = findLastUserMessage(ctx.sessionManager.getBranch())
+      const target = findNthPreviousUserMessage(ctx.sessionManager.getBranch(), count)
       if (!target) {
-        ctx.ui.notify("No previous text user message found to rewind", "warning")
+        ctx.ui.notify(`No text user message found ${count} message${count === 1 ? "" : "s"} back to rewind`, "warning")
         return
       }
 
@@ -53,7 +73,7 @@ export default function rewindExtension(pi: ExtensionAPI): void {
       }
 
       ctx.ui.setEditorText(target.text)
-      ctx.ui.notify("Rewound to last user message", "info")
+      ctx.ui.notify(`Rewound to previous user message #${count}`, "info")
     },
   })
 }
