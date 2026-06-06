@@ -1,10 +1,10 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent"
 import { Type } from "typebox"
-import { DefinitionRequest, DocumentSymbolRequest, ReferencesRequest } from "vscode-languageserver-protocol"
-import type { DocumentSymbol, Location, LocationLink, SymbolInformation } from "vscode-languageserver-protocol"
+import { DefinitionRequest, DocumentSymbolRequest, HoverRequest, ImplementationRequest, ReferencesRequest, TypeDefinitionRequest, WorkspaceSymbolRequest } from "vscode-languageserver-protocol"
+import type { DocumentSymbol, Hover, Location, LocationLink, SymbolInformation, WorkspaceSymbol } from "vscode-languageserver-protocol"
 
 import { LspClientManager } from "./client.ts"
-import { formatDefinitions, formatDocumentSymbols, formatReferences } from "./format.ts"
+import { formatDefinitions, formatDocumentSymbols, formatHover, formatImplementations, formatReferences, formatTypeDefinitions, formatWorkspaceSymbols } from "./format.ts"
 import { resolveSymbolPosition } from "./position.ts"
 
 const DEFAULT_TIMEOUT_MS = 30_000
@@ -12,6 +12,7 @@ const MIN_TIMEOUT_MS = 1_000
 const MAX_TIMEOUT_MS = 120_000
 
 const FileParam = Type.String({ description: "Path to the target file, relative to the current workspace or absolute inside it" })
+const WorkspaceFileParam = Type.String({ description: "Path to any file in the target workspace, used to select the local language server" })
 const LineParam = Type.Number({ description: "1-indexed source line containing the symbol" })
 const SymbolParam = Type.String({ description: "Exact symbol text on the target line. Use suffix like foo#2 for repeated occurrences on one line." })
 const TimeoutParam = Type.Optional(Type.Number({ description: "Request timeout in milliseconds (default: 30000, max: 120000)", default: DEFAULT_TIMEOUT_MS }))
@@ -34,6 +35,33 @@ const ReferencesParams = Type.Object({
   line: LineParam,
   symbol: SymbolParam,
   includeDeclaration: Type.Optional(Type.Boolean({ description: "Include the symbol declaration in results (default: true)", default: true })),
+  timeout: TimeoutParam,
+})
+
+const HoverParams = Type.Object({
+  file: FileParam,
+  line: LineParam,
+  symbol: SymbolParam,
+  timeout: TimeoutParam,
+})
+
+const WorkspaceSymbolsParams = Type.Object({
+  file: WorkspaceFileParam,
+  query: Type.String({ description: "Workspace symbol query to send to the language server" }),
+  timeout: TimeoutParam,
+})
+
+const TypeDefinitionParams = Type.Object({
+  file: FileParam,
+  line: LineParam,
+  symbol: SymbolParam,
+  timeout: TimeoutParam,
+})
+
+const ImplementationParams = Type.Object({
+  file: FileParam,
+  line: LineParam,
+  symbol: SymbolParam,
   timeout: TimeoutParam,
 })
 
@@ -153,6 +181,163 @@ export default function lspToolsExtension(pi: ExtensionAPI) {
           line: params.line,
           symbol: params.symbol,
           includeDeclaration: params.includeDeclaration ?? true,
+        },
+      }
+    },
+  })
+
+  pi.registerTool({
+    name: "lsp_hover",
+    label: "LSP Hover",
+    description: "Use when you need semantic type, signature, or documentation details for a symbol. Returns hover information at a specific file line.",
+    promptSnippet: "Show hover/type documentation for a symbol at a file line via the local language server.",
+    promptGuidelines: ["Use lsp_hover before editing unfamiliar symbols when type/signature information would reduce guesswork."],
+    parameters: HoverParams,
+    async execute(_toolCallId, params, signal, _onUpdate, ctx) {
+      const timeout = normalizeTimeout(params.timeout)
+      const { client, resolution } = await manager.getClientForFile(ctx.cwd, params.file)
+
+      await client.ensureStarted(signal, timeout)
+      assertCapability(client.capabilities?.hoverProvider, "textDocument/hover")
+      await client.ensureFileOpen(resolution.targetFilePath)
+      const position = await resolveSymbolPosition(resolution.targetFilePath, params.line, params.symbol, client.positionEncoding)
+
+      const result = await client.sendRequest<Hover | null>(
+        HoverRequest.type,
+        {
+          textDocument: { uri: client.documentUri(resolution.targetFilePath) },
+          position,
+        },
+        signal,
+        timeout,
+      )
+
+      const text = formatHover(result)
+      return {
+        content: [{ type: "text" as const, text }],
+        details: {
+          serverName: resolution.serverName,
+          workspaceRoot: resolution.workspaceRoot,
+          file: resolution.targetFilePath,
+          line: params.line,
+          symbol: params.symbol,
+        },
+      }
+    },
+  })
+
+  pi.registerTool({
+    name: "lsp_workspace_symbols",
+    label: "LSP Workspace Symbols",
+    description: "Use when you need to find symbols across a workspace semantically. Searches workspace symbols with the local language server.",
+    promptSnippet: "Search semantic workspace symbols via the local language server.",
+    promptGuidelines: ["Use lsp_workspace_symbols when you know a symbol name but not its file, especially before broad text search."],
+    parameters: WorkspaceSymbolsParams,
+    async execute(_toolCallId, params, signal, _onUpdate, ctx) {
+      const timeout = normalizeTimeout(params.timeout)
+      const { client, resolution } = await manager.getClientForFile(ctx.cwd, params.file)
+
+      await client.ensureStarted(signal, timeout)
+      assertCapability(client.capabilities?.workspaceSymbolProvider, "workspace/symbol")
+      await client.ensureFileOpen(resolution.targetFilePath)
+
+      const result = await client.sendRequest<Array<SymbolInformation | WorkspaceSymbol> | null>(
+        WorkspaceSymbolRequest.type,
+        {
+          query: params.query,
+        },
+        signal,
+        timeout,
+      )
+
+      const text = formatWorkspaceSymbols(result, resolution.cwd, params.query)
+      return {
+        content: [{ type: "text" as const, text }],
+        details: {
+          serverName: resolution.serverName,
+          workspaceRoot: resolution.workspaceRoot,
+          file: resolution.targetFilePath,
+          query: params.query,
+        },
+      }
+    },
+  })
+
+  pi.registerTool({
+    name: "lsp_type_definition",
+    label: "LSP Type Definition",
+    description: "Use when you need to locate the type behind a symbol. Finds semantic type definitions for a symbol at a specific file line.",
+    promptSnippet: "Find semantic type definitions for a symbol at a file line via the local language server.",
+    promptGuidelines: ["Use lsp_type_definition to jump from a value or usage to its underlying type, interface, or declaration."],
+    parameters: TypeDefinitionParams,
+    async execute(_toolCallId, params, signal, _onUpdate, ctx) {
+      const timeout = normalizeTimeout(params.timeout)
+      const { client, resolution } = await manager.getClientForFile(ctx.cwd, params.file)
+
+      await client.ensureStarted(signal, timeout)
+      assertCapability(client.capabilities?.typeDefinitionProvider, "textDocument/typeDefinition")
+      await client.ensureFileOpen(resolution.targetFilePath)
+      const position = await resolveSymbolPosition(resolution.targetFilePath, params.line, params.symbol, client.positionEncoding)
+
+      const result = await client.sendRequest<Location | Location[] | LocationLink[] | null>(
+        TypeDefinitionRequest.type,
+        {
+          textDocument: { uri: client.documentUri(resolution.targetFilePath) },
+          position,
+        },
+        signal,
+        timeout,
+      )
+
+      const text = await formatTypeDefinitions(result, resolution.cwd)
+      return {
+        content: [{ type: "text" as const, text }],
+        details: {
+          serverName: resolution.serverName,
+          workspaceRoot: resolution.workspaceRoot,
+          file: resolution.targetFilePath,
+          line: params.line,
+          symbol: params.symbol,
+        },
+      }
+    },
+  })
+
+  pi.registerTool({
+    name: "lsp_implementation",
+    label: "LSP Implementation",
+    description: "Use when you need concrete implementations of an interface, abstract member, or symbol. Finds implementations at a specific file line.",
+    promptSnippet: "Find semantic implementations for a symbol at a file line via the local language server.",
+    promptGuidelines: ["Use lsp_implementation to navigate from interfaces, abstract members, or declarations to concrete implementations."],
+    parameters: ImplementationParams,
+    async execute(_toolCallId, params, signal, _onUpdate, ctx) {
+      const timeout = normalizeTimeout(params.timeout)
+      const { client, resolution } = await manager.getClientForFile(ctx.cwd, params.file)
+
+      await client.ensureStarted(signal, timeout)
+      assertCapability(client.capabilities?.implementationProvider, "textDocument/implementation")
+      await client.ensureFileOpen(resolution.targetFilePath)
+      const position = await resolveSymbolPosition(resolution.targetFilePath, params.line, params.symbol, client.positionEncoding)
+
+      const result = await client.sendRequest<Location | Location[] | LocationLink[] | null>(
+        ImplementationRequest.type,
+        {
+          textDocument: { uri: client.documentUri(resolution.targetFilePath) },
+          position,
+        },
+        signal,
+        timeout,
+      )
+
+      const text = await formatImplementations(result, resolution.cwd)
+      return {
+        content: [{ type: "text" as const, text }],
+        details: {
+          serverName: resolution.serverName,
+          workspaceRoot: resolution.workspaceRoot,
+          file: resolution.targetFilePath,
+          line: params.line,
+          symbol: params.symbol,
         },
       }
     },

@@ -7,7 +7,8 @@ import path from "node:path"
 import type { LspServerConfig, LspToolsConfig, ResolvedLspServer } from "./types.ts"
 import { isPathInside, realpathInsideCwd } from "./uri.ts"
 
-const EXTENSION_DIR = path.dirname(fileURLToPath(import.meta.url))
+const SOURCE_DIR = path.dirname(fileURLToPath(import.meta.url))
+const EXTENSION_DIR = path.dirname(SOURCE_DIR)
 
 const DEFAULT_SERVERS: Record<string, LspServerConfig> = {
   typescript: {

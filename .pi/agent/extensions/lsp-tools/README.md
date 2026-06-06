@@ -7,6 +7,10 @@ Pi extension that exposes focused semantic code-navigation tools backed by local
 - `lsp_document_symbols` — list semantic symbols in a file.
 - `lsp_go_to_definition` — find the definition of a symbol at a specific line.
 - `lsp_find_references` — find semantic references for a symbol at a specific line.
+- `lsp_hover` — show type, signature, or documentation details for a symbol.
+- `lsp_workspace_symbols` — search semantic symbols across a workspace.
+- `lsp_type_definition` — find the type definition behind a symbol.
+- `lsp_implementation` — find concrete implementations of a symbol.
 
 The tools are read-only. Rename/workspace edits are intentionally not included yet.
 
@@ -130,6 +134,22 @@ Use lsp_go_to_definition on src/index.ts line 12 symbol createClient
 
 ```text
 Use lsp_find_references on src/index.ts line 12 symbol createClient
+```
+
+```text
+Use lsp_hover on src/index.ts line 12 symbol createClient
+```
+
+```text
+Use lsp_workspace_symbols from src/index.ts query createClient
+```
+
+```text
+Use lsp_type_definition on src/index.ts line 12 symbol createClient
+```
+
+```text
+Use lsp_implementation on src/index.ts line 12 symbol createClient
 ```
 
 If a line contains the same symbol more than once, use a suffix:

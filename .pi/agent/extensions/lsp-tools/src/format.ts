@@ -1,13 +1,15 @@
 import { readFileSync } from "node:fs"
 import path from "node:path"
 
-import type { DocumentSymbol, Location, LocationLink, SymbolInformation } from "vscode-languageserver-protocol"
+import type { DocumentSymbol, Hover, Location, LocationLink, MarkedString, MarkupContent, SymbolInformation, WorkspaceSymbol } from "vscode-languageserver-protocol"
 
 import { fileUriToPath, isPathInside } from "./uri.ts"
 
 const REFERENCE_LIMIT = 80
 const DEFINITION_LIMIT = 20
 const SYMBOL_LIMIT = 200
+const WORKSPACE_SYMBOL_LIMIT = 100
+const HOVER_MAX_CHARS = 4_000
 
 const SYMBOL_KINDS: Record<number, string> = {
   1: "File",
@@ -43,8 +45,35 @@ export function formatReferences(locations: Location[] | null | undefined, cwd: 
 }
 
 export async function formatDefinitions(result: Location | Location[] | LocationLink[] | null | undefined, cwd: string): Promise<string> {
-  const locations = normalizeDefinitionResult(result)
-  return formatLocations("Definitions", locations, cwd, DEFINITION_LIMIT, true)
+  return formatLocationResult("Definitions", result, cwd)
+}
+
+export async function formatTypeDefinitions(result: Location | Location[] | LocationLink[] | null | undefined, cwd: string): Promise<string> {
+  return formatLocationResult("Type definitions", result, cwd)
+}
+
+export async function formatImplementations(result: Location | Location[] | LocationLink[] | null | undefined, cwd: string): Promise<string> {
+  return formatLocationResult("Implementations", result, cwd)
+}
+
+export function formatHover(result: Hover | null | undefined): string {
+  if (!result) return "Hover: no content returned by the language server."
+
+  const text = formatHoverContents(result.contents).trim()
+  if (!text) return "Hover: no content returned by the language server."
+
+  const suffix = text.length > HOVER_MAX_CHARS ? `\n... truncated ${text.length - HOVER_MAX_CHARS} additional character(s)` : ""
+  return `Hover:\n${text.slice(0, HOVER_MAX_CHARS)}${suffix}`
+}
+
+export function formatWorkspaceSymbols(result: Array<SymbolInformation | WorkspaceSymbol> | null | undefined, cwd: string, query: string): string {
+  const symbols = result ?? []
+  if (symbols.length === 0) return `Workspace symbols: no symbols matched query "${query}".`
+
+  const shown = symbols.slice(0, WORKSPACE_SYMBOL_LIMIT)
+  const lines = shown.map((symbol) => formatWorkspaceSymbol(symbol, cwd))
+  const suffix = symbols.length > shown.length ? `\n... truncated ${symbols.length - shown.length} additional symbol(s)` : ""
+  return `Workspace symbols (${shown.length}${symbols.length > shown.length ? ` of ${symbols.length}` : ""}):\n${lines.join("\n")}${suffix}`
 }
 
 export function formatDocumentSymbols(result: DocumentSymbol[] | SymbolInformation[] | null | undefined, cwd: string, query?: string): string {
@@ -64,6 +93,11 @@ export function formatDocumentSymbols(result: DocumentSymbol[] | SymbolInformati
   return `Document symbols (${shown.length}${filtered.length > shown.length ? ` of ${filtered.length}` : ""}):\n${shown.join("\n")}${suffix}`
 }
 
+function formatLocationResult(title: string, result: Location | Location[] | LocationLink[] | null | undefined, cwd: string): string {
+  const locations = normalizeDefinitionResult(result)
+  return formatLocations(title, locations, cwd, DEFINITION_LIMIT, true)
+}
+
 function formatLocations(title: string, locations: Location[], cwd: string, limit: number, includePreview: boolean): string {
   if (locations.length === 0) return `${title}: no locations returned by the language server.`
 
@@ -71,6 +105,31 @@ function formatLocations(title: string, locations: Location[], cwd: string, limi
   const lines = shown.map((location) => formatLocation(location, cwd, includePreview))
   const suffix = locations.length > shown.length ? `\n... truncated ${locations.length - shown.length} additional location(s)` : ""
   return `${title} (${shown.length}${locations.length > shown.length ? ` of ${locations.length}` : ""}):\n${lines.join("\n")}${suffix}`
+}
+
+function formatHoverContents(contents: Hover["contents"]): string {
+  if (typeof contents === "string") return contents
+  if (Array.isArray(contents)) return contents.map(formatMarkedString).filter(Boolean).join("\n\n")
+  if (isMarkupContent(contents)) return contents.value
+  return formatMarkedString(contents)
+}
+
+function formatMarkedString(value: MarkedString): string {
+  if (typeof value === "string") return value
+  return `\`\`\`${value.language}\n${value.value}\n\`\`\``
+}
+
+function isMarkupContent(value: MarkedString | MarkupContent): value is MarkupContent {
+  return typeof value === "object" && "kind" in value
+}
+
+function formatWorkspaceSymbol(symbol: SymbolInformation | WorkspaceSymbol, cwd: string): string {
+  const location = symbol.location
+  const uri = location.uri
+  const displayPath = displayPathFor(cwd, fileUriToPath(uri))
+  const position = "range" in location ? `:${location.range.start.line + 1}:${location.range.start.character + 1}` : ""
+  const container = "containerName" in symbol && symbol.containerName ? ` in ${symbol.containerName}` : ""
+  return `- ${symbol.name} (${kindName(symbol.kind)})${container} @ ${displayPath}${position}`
 }
 
 function formatLocation(location: Location, cwd: string, includePreview: boolean): string {
