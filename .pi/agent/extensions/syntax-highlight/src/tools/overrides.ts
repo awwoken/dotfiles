@@ -12,12 +12,6 @@ import {
 } from "@earendil-works/pi-coding-agent";
 import { Container, Spacer, Text } from "@earendil-works/pi-tui";
 import { renderWriteDiffResult, renderEditDiffResult } from "../diff/renderer.ts";
-import { parseDiff } from "../diff/parse.ts";
-import {
-	buildWriteEntries,
-	buildWriteOverwriteEntries,
-	splitWriteContentLines,
-} from "../diff/write-model.ts";
 import {
 	buildPendingEditPreviewData,
 	buildPendingWritePreviewData,
@@ -104,8 +98,6 @@ const EDIT_EXECUTION_META_STATE_KEY = "__syntaxHighlightEditExecutionMeta";
 const WRITE_EXECUTION_META_STATE_KEY = "__syntaxHighlightWriteExecutionMeta";
 const EDIT_PENDING_PREVIEW_STATE_KEY = "__syntaxHighlightEditPendingPreview";
 const WRITE_PENDING_PREVIEW_STATE_KEY = "__syntaxHighlightWritePendingPreview";
-const EDIT_HEADER_SUFFIX_STATE_KEY = "__syntaxHighlightEditHeaderSuffix";
-const WRITE_HEADER_SUFFIX_STATE_KEY = "__syntaxHighlightWriteHeaderSuffix";
 
 function registerRuntimeTool(pi: ExtensionAPI, tool: RuntimeToolDefinition): void {
 	pi.registerTool(tool as unknown as ToolDefinition);
@@ -218,69 +210,6 @@ function toStateCarrier(value: unknown): Record<string, unknown> | undefined {
 		return undefined;
 	}
 	return value as Record<string, unknown>;
-}
-
-function getHeaderSuffix(context: ToolRenderContextLike | undefined, stateKey: string): string {
-	const carrier = toStateCarrier(context?.state);
-	const value = carrier?.[stateKey];
-	return typeof value === "string" && value.length > 0 ? ` ${value}` : "";
-}
-
-function setHeaderSuffix(context: ToolRenderContextLike | undefined, stateKey: string, suffix: string): void {
-	const carrier = toStateCarrier(context?.state);
-	if (!carrier) {
-		return;
-	}
-	if (carrier[stateKey] === suffix) {
-		return;
-	}
-	carrier[stateKey] = suffix;
-	context?.invalidate?.();
-}
-
-function formatDiffSuffix(added: number, removed: number, theme: RenderTheme): string {
-	return `${theme.fg("toolDiffAdded", `+${added}`)} ${theme.fg("toolDiffRemoved", `-${removed}`)}`;
-}
-
-function getEditDiffSuffix(details: unknown, theme: RenderTheme): string {
-	const rawDiff = toRecord(details).diff;
-	const diff = typeof rawDiff === "string" ? rawDiff : "";
-	if (!diff.trim()) {
-		return "";
-	}
-	try {
-		const stats = parseDiff(diff).stats;
-		return formatDiffSuffix(stats.added, stats.removed, theme);
-	} catch {
-		return "";
-	}
-}
-
-function getWriteDiffSuffix(
-	content: string | undefined,
-	executionMeta: WriteExecutionMeta | undefined,
-	theme: RenderTheme,
-): string {
-	if (typeof content !== "string") {
-		return "";
-	}
-	const nextLines = splitWriteContentLines(content);
-	const entries = executionMeta?.fileExistedBeforeWrite && typeof executionMeta.previousContent === "string"
-		? buildWriteOverwriteEntries(splitWriteContentLines(executionMeta.previousContent), nextLines)
-		: buildWriteEntries(nextLines);
-	let added = 0;
-	let removed = 0;
-	for (const entry of entries) {
-		if (entry.kind !== "line") {
-			continue;
-		}
-		if (entry.lineKind === "add") {
-			added++;
-		} else if (entry.lineKind === "remove") {
-			removed++;
-		}
-	}
-	return formatDiffSuffix(added, removed, theme);
 }
 
 function rememberMeta<T>(pendingMetaByToolCallId: Map<string, T>, toolCallId: string, meta: T): void {
@@ -475,7 +404,7 @@ export function registerSyntaxHighlightToolOverrides(
 			renderCall(args: unknown, theme: RenderTheme, context: ToolRenderContextLike) {
 				const path = shortenPath(getToolPathArg(args));
 				const lineCount = getEditLineCount(args);
-				const summaryText = `${theme.fg("toolTitle", theme.bold("edit"))} ${theme.fg("accent", path || "...")}${formatLineCountSuffix(lineCount, theme)}${getHeaderSuffix(context, EDIT_HEADER_SUFFIX_STATE_KEY)}`;
+				const summaryText = `${theme.fg("toolTitle", theme.bold("edit"))} ${theme.fg("accent", path || "...")}${formatLineCountSuffix(lineCount, theme)}`;
 				if (!context.argsComplete || !context.isPartial) {
 					return new Text(summaryText, 0, 0);
 				}
@@ -511,7 +440,6 @@ export function registerSyntaxHighlightToolOverrides(
 					editExecutionMetaByToolCallId,
 					EDIT_EXECUTION_META_STATE_KEY,
 				) as EditExecutionMeta | undefined;
-				setHeaderSuffix(context, EDIT_HEADER_SUFFIX_STATE_KEY, getEditDiffSuffix(result.details, theme));
 				return renderEditDiffResult(
 					result.details as EditToolDetails | undefined,
 					{
@@ -552,7 +480,7 @@ export function registerSyntaxHighlightToolOverrides(
 				const suffix = shouldRenderWriteCallSummary({ hasContent: content !== undefined, hasDetailedResultHeader: false })
 					? formatWriteCallSuffix(lineCount, sizeBytes, theme)
 					: "";
-				const summaryText = `${theme.fg("toolTitle", theme.bold("write"))} ${theme.fg("accent", path || "...")}${suffix}${getHeaderSuffix(context, WRITE_HEADER_SUFFIX_STATE_KEY)}`;
+				const summaryText = `${theme.fg("toolTitle", theme.bold("write"))} ${theme.fg("accent", path || "...")}${suffix}`;
 				if (!context.argsComplete || !context.isPartial) {
 					return new Text(summaryText, 0, 0);
 				}
@@ -583,7 +511,6 @@ export function registerSyntaxHighlightToolOverrides(
 					writeExecutionMetaByToolCallId,
 					WRITE_EXECUTION_META_STATE_KEY,
 				) as WriteExecutionMeta | undefined;
-				setHeaderSuffix(context, WRITE_HEADER_SUFFIX_STATE_KEY, getWriteDiffSuffix(content, executionMeta, theme));
 				return renderWriteDiffResult(
 					content,
 					{

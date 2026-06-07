@@ -1057,6 +1057,13 @@ function renderDiffSpacerLine(width: number): string {
 	return safeWidth > 0 ? " ".repeat(safeWidth) : "";
 }
 
+function renderDiffStatsLine(stats: Pick<DiffStats, "added" | "removed">, width: number, theme: DiffTheme): string {
+	return clampDiffLineToWidth(
+		`${theme.fg("muted", "↳")} ${theme.fg("toolDiffAdded", `+${stats.added}`)} ${theme.fg("toolDiffRemoved", `-${stats.removed}`)}`,
+		width,
+	);
+}
+
 function applyLineLimit(
 	rows: RenderedRow[],
 	width: number,
@@ -1249,7 +1256,10 @@ export function renderEditDiffResult(
 				parsed.stats.hunks,
 				theme,
 			);
-			cachedLines = clampDiffLinesToWidth(bodyWithLimit, safeWidth);
+			cachedLines = clampDiffLinesToWidth([
+				renderDiffStatsLine(parsed.stats, safeWidth, theme),
+				...bodyWithLimit,
+			], safeWidth);
 			cachedWidth = safeWidth;
 			cachedExpanded = options.expanded;
 			cachedMode = mode;
@@ -1420,7 +1430,10 @@ export function renderWriteDiffResult(
 				data.hunkCount,
 				theme,
 			);
-			cachedLines = clampDiffLinesToWidth(bodyWithLimit, safeWidth);
+			cachedLines = clampDiffLinesToWidth([
+				renderDiffStatsLine(data.stats, safeWidth, theme),
+				...bodyWithLimit,
+			], safeWidth);
 			cachedWidth = safeWidth;
 			cachedExpanded = options.expanded;
 			cachedMode = mode;
