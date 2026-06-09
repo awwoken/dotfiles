@@ -112,6 +112,6 @@ Instead, name the Pi artifact that should carry the behavior and briefly explain
 
 ## Finishing Changes
 
-After modifying Pi-related code or markdown, format the changed code and markdown before finishing when a formatter is available.
+After modifying Pi-related code or markdown, including README files, format the changed code and markdown before finishing when a formatter is available.
 
 After modifying Pi extension TypeScript code, run the relevant type-check command when available before finishing. If type-checking is unavailable or skipped, state why.
