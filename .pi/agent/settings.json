@@ -2,18 +2,13 @@
   "defaultModel": "gpt-5.5",
   "defaultProvider": "openai-codex",
   "defaultThinkingLevel": "high",
-  "lastChangelogVersion": "0.78.1",
+  "lastChangelogVersion": "0.79.0",
   "collapseChangelog": true,
   "quietStartup": true,
   "packages": [
     {
-      "source": "npm:pi-mcp-adapter"
-    },
-    {
       "source": "npm:context-mode",
-      "skills": [
-        "context-mode"
-      ]
+      "skills": ["context-mode"]
     },
     {
       "source": "npm:@upstash/context7-pi",
@@ -21,6 +16,10 @@
       "prompts": []
     }
   ],
+  "mcp": {
+    "configPath": "mcp.json",
+    "prefixTools": true
+  },
   "syntaxHighlight": {
     "registerToolOverrides": {
       "bash": true,
@@ -32,5 +31,5 @@
     "diffWordWrap": true
   },
   "theme": "minimal",
-  "hideThinkingBlock": true
+  "hideThinkingBlock": false
 }
