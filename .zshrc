@@ -7,6 +7,8 @@ export HOMEBREW_NO_ENV_HINTS=1
 
 export PATH="$HOME/.cargo/bin:$PATH"
 
+export PATH="$HOME/Library/Python/3.14/bin:$PATH"
+
 # Local bin
 export PATH="$HOME/.local/bin:$PATH"
 
@@ -16,7 +18,8 @@ export PATH="$HOME/.bun/bin:$PATH"
 # LazyGit (git TUI)
 export XDG_CONFIG_HOME="$HOME/.config"
 
-# # NVM (Node Version Manager)
+
+# NVM (Node Version Manager)
 export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
@@ -38,6 +41,8 @@ load-nvmrc() {
 
 add-zsh-hook chpwd load-nvmrc
 load-nvmrc
+
+export PATH="$HOME/.shim/bin:$PATH"
 
 # Pi coding agent runner.
 pi() {
@@ -151,10 +156,7 @@ export PATH=$PATH:$ANDROID_HOME/platform-tools
 # export JAVA_HOME=$(/usr/libexec/java_home -v 17)
 export JAVA_HOME="$(brew --prefix)/opt/openjdk@17"
 
-# # OpenClaw Completion
-# source "/Users/andromeda/.openclaw/completions/openclaw.zsh"
-
 export DOCKER_CLI_HINTS=false
 
-
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# Bun completions
+[ -s "~/.bun/_bun" ] && source "~/.bun/_bun"
