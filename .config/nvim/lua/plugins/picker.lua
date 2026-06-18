@@ -27,10 +27,10 @@ vim.schedule(function()
 	local MiniPick = require("mini.pick")
 
 	MiniPick.setup({
-		mappings = {
-			move_up = "<C-k>",
-			move_down = "<C-j>",
-		},
+		-- mappings = {
+		-- 	move_up = "<C-k>",
+		-- 	move_down = "<C-j>",
+		-- },
 		options = {
 			use_cache = true,
 		},

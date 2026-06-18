@@ -19,6 +19,27 @@ vim.schedule(function()
 		},
 	})
 
+	local MiniAi = require("mini.ai")
+	MiniAi.setup()
+
+	local MiniGit = require("mini.git")
+	MiniGit.setup()
+
+	local MiniDiff = require("mini.diff")
+	MiniDiff.setup({
+		view = {
+			style = "sign",
+			signs = {
+				add = "▌",
+				change = "▌",
+				delete = "▌",
+			},
+		},
+	})
+
+	local MiniStatusline = require("mini.statusline")
+	MiniStatusline.setup()
+
 	local MiniPairs = require("mini.pairs")
 	MiniPairs.setup()
 end)

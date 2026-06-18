@@ -9,12 +9,13 @@ vim.opt.clipboard = "unnamedplus" -- Use the system clipboard for copy/paste
 vim.opt.mouse = "" -- Disable mouse support
 
 vim.opt.tabstop = 2 -- Set the number of spaces a tab represents
+vim.opt.shiftwidth = 2 -- Spaces per indentation level
+vim.opt.softtabstop = 2 -- Spaces inserted or deleted when pressing Tab or Backspace
 vim.opt.hlsearch = true -- Highlight search results
 vim.opt.autoindent = false -- Enable automatic indentation
 vim.opt.incsearch = true -- Incremental search (highlight as you type)
 vim.o.expandtab = true -- Expand tab input with spaces characters
 -- vim.o.smartindent = true -- Syntax aware indentations for newline inserts
--- vim.o.shiftwidth = 2 -- Spaces per indentation level
 
 vim.opt.virtualedit = "block"
 vim.opt.fillchars = { eob = " " } -- Use a space to fill the end of buffer

@@ -21,6 +21,11 @@ vim.schedule(function()
 			sh = { "shfmt" },
 			zsh = { "shfmt" },
 		},
+		-- format_on_save = {
+		-- 	-- These options will be passed to conform.format()
+		-- 	timeout_ms = 500,
+		-- 	lsp_format = "fallback",
+		-- },
 	})
 
 	vim.keymap.set({ "n", "v" }, "<leader>l", function()
