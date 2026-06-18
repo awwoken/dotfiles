@@ -6,6 +6,7 @@ import type {
 } from "@earendil-works/pi-coding-agent";
 import {
 	createBashTool,
+	createBashToolDefinition,
 	createEditTool,
 	createWriteTool,
 	formatSize,
@@ -30,6 +31,7 @@ import { renderBashCall } from "./bash-display.ts";
 
 interface BuiltInTools {
 	bash: ReturnType<typeof createBashTool>;
+	bashDefinition: ReturnType<typeof createBashToolDefinition>;
 	edit: ReturnType<typeof createEditTool>;
 	write: ReturnType<typeof createWriteTool>;
 }
@@ -115,6 +117,7 @@ function getBuiltInTools(cwd: string): BuiltInTools {
 		};
 		tools = {
 			get bash() { return get("bash", () => createBashTool(cwd)); },
+			get bashDefinition() { return get("bashDefinition", () => createBashToolDefinition(cwd)); },
 			get edit() { return get("edit", () => createEditTool(cwd)); },
 			get write() { return get("write", () => createWriteTool(cwd)); },
 		} as BuiltInTools;
@@ -546,7 +549,7 @@ export function registerSyntaxHighlightToolOverrides(
 				return renderBashCall(args, theme, context);
 			},
 			renderResult(result: RenderResultLike, options: ToolRenderResultOptions, theme: RenderTheme, context?: ToolRenderContextLike) {
-				const builtInRenderResult = toRecord(bootstrapTools.bash).renderResult;
+				const builtInRenderResult = toRecord(bootstrapTools.bashDefinition).renderResult;
 				return typeof builtInRenderResult === "function"
 					? (builtInRenderResult as BuiltInRenderResult)(result, options, theme, context)
 					: new Text(extractTextOutput(result), 0, 0);

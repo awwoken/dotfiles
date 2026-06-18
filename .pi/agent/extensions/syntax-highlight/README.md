@@ -8,7 +8,7 @@ Local Pi extension for syntax-highlighted `edit`/`write` diffs and bash command 
 - Delegates actual file mutation and command execution to Pi's built-in tools.
 - Renders syntax-highlighted split/unified diffs for `edit` and `write` results.
 - Shows pending edit/write previews while tool arguments are still streaming when a safe workspace-local preview can be computed.
-- Syntax-highlights bash command call lines while leaving bash output to Pi's built-in renderer.
+- Syntax-highlights bash command call lines while leaving bash output, including collapsed muted previews, to Pi's built-in renderer.
 - Uses full-file before/after highlighting context when available, so partial diff hunks preserve multi-line syntax state more accurately.
 - Falls back to per-line highlighting when full-file context is unavailable or too large.
 

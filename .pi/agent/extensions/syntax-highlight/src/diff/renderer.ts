@@ -564,6 +564,26 @@ function computeInlineDiffSpans(leftLine: string, rightLine: string): { left: Di
 	};
 }
 
+function splitRowsContainReplacement(rows: SplitDiffRow[]): boolean {
+	return rows.some((row) => row.left?.lineKind === "remove" && row.right?.lineKind === "add");
+}
+
+function parsedEntriesContainChange(entries: ParsedDiffEntry[]): boolean {
+	return entries.some(
+		(entry) => entry.kind === "line" && (entry.lineKind === "add" || entry.lineKind === "remove"),
+	);
+}
+
+function shouldRenderAutoEditDiffAsUnified(
+	entries: ParsedDiffEntry[],
+	rows: SplitDiffRow[],
+	config: Pick<SyntaxHighlightConfig, "diffViewMode">,
+): boolean {
+	return config.diffViewMode === "auto"
+		&& parsedEntriesContainChange(entries)
+		&& !splitRowsContainReplacement(rows);
+}
+
 function buildInlineHighlightMap(rows: SplitDiffRow[]): WeakMap<DiffLineEntry, DiffSpan[]> {
 	const highlights = new WeakMap<DiffLineEntry, DiffSpan[]>();
 
@@ -1192,6 +1212,7 @@ export function renderEditDiffResult(
 	}
 
 	const splitRows = buildSplitRows(parsed.entries);
+	const forceUnifiedAutoMode = shouldRenderAutoEditDiffAsUnified(parsed.entries, splitRows, config);
 	const showHashlineAnchors = options.expanded === true
 		&& parsed.entries.some((entry) => entry.kind === "line" && !!entry.hashlineAnchorContent);
 	const lineNumberWidth = getLineNumberWidth(parsed.entries, showHashlineAnchors);
@@ -1212,7 +1233,9 @@ export function renderEditDiffResult(
 	return {
 		render(width: number): string[] {
 			const safeWidth = normalizeDiffRenderWidth(width);
-			const mode = resolveDiffPresentationMode(config, canRenderSplitLayout(safeWidth));
+			const mode: DiffPresentationMode = forceUnifiedAutoMode
+				? "unified"
+				: resolveDiffPresentationMode(config, canRenderSplitLayout(safeWidth));
 			if (
 				cachedLines
 				&& cachedWidth === safeWidth
