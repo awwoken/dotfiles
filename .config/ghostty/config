@@ -1,4 +1,7 @@
 font-size = 20
+font-feature = -liga
+font-feature = -clig
+font-feature = -calt
 theme = One Dark
 scrollback-limit = 50000000
 split-divider-color = #3e4451

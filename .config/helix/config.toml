@@ -1,3 +1,5 @@
+theme = "onedark"
+
 # Open Yazi and open selected file in Helix
 [keys.normal.space]
 e = [

@@ -7,6 +7,14 @@ formatter = { command = "prettier", args = [
 auto-format = true
 
 [[language]]
+name = "javascript"
+formatter = { command = "prettier", args = [
+  "--stdin-filepath",
+  "%{buffer_name}",
+] }
+auto-format = true
+
+[[language]]
 name = "tsx"
 formatter = { command = "prettier", args = [
   "--stdin-filepath",
@@ -17,4 +25,14 @@ auto-format = true
 [[language]]
 name = "toml"
 formatter = { command = "taplo", args = ["fmt", "-"] }
+auto-format = true
+
+[[language]]
+name = "html"
+language-servers = [
+  { name = "superhtml", except-features = [
+    "format",
+  ] },
+  "vscode-html-language-server",
+]
 auto-format = true
