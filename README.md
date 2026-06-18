@@ -12,6 +12,7 @@ My development environment configuration, managed as a dotfiles repository and i
 │   ├── aerospace/          # AeroSpace window manager
 │   ├── fd/                 # fd defaults
 │   ├── ghostty/            # Ghostty terminal
+│   ├── helix/              # Helix language configuration
 │   ├── kitty/              # Kitty terminal
 │   ├── lazygit/            # Lazygit configuration
 │   ├── nvim/               # Neovim configuration
@@ -20,8 +21,8 @@ My development environment configuration, managed as a dotfiles repository and i
 │   ├── starship/           # Starship prompt
 │   └── zed/                # Zed editor preferences
 ├── .pi/
-│   ├── agent/              # Pi agent settings, prompts, skills, themes, and extensions
-│   └── mcp.json            # Pi MCP server configuration
+│   ├── agent/              # Pi agent settings, prompts, skills, themes, MCP config, and extensions
+│   └── run.sh              # Pi launcher that installs local extension dependencies
 ├── .gitignore_global       # Global Git ignore rules
 ├── .hushlogin              # Suppress macOS login message
 └── README.md
@@ -48,7 +49,21 @@ At minimum, install:
 3. Homebrew
 4. GNU Stow
 
-Additional tools are configured here, but can be installed incrementally as needed.
+
+## Expected installed packages
+
+These dotfiles reference the following user/system-level tools. Install them as needed for the configs you use:
+
+- Core shell/dev tools: `git`, `node`, `npm`, `bun`, `nvm`, `stow`, `zsh`
+- Shell quality-of-life tools: `bat`, `eza`, `fd`, `ripgrep`, `starship`, `zoxide`
+- Terminal/editor apps: `aerospace`, `ghostty`, `helix`, `kitty`, `lazygit`, `neovim`, `vim`, `yazi`, `zed`
+- Git UI helpers: `diff-so-fancy`
+- Pi agent: `pi` CLI; `.pi/run.sh` uses `npm` to install local extension dependencies automatically
+- Helix/Zed external formatters and language tools: `prettier`, `stylua`, `superhtml`, `taplo`, `vscode-html-language-server`
+- Android/Java paths in `.zshrc`: Android SDK platform tools and `openjdk@17`
+- Fonts: a Nerd Font such as `JetBrainsMonoNL Nerd Font Propo` for Kitty icons/glyphs
+
+Not listed here: Neovim language servers, formatters, and linters installed by Mason (`mason-tool-installer.nvim`), and Pi extension package dependencies installed by `.pi/run.sh`.
 
 ## macOS preferences
 
