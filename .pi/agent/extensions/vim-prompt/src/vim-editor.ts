@@ -23,6 +23,11 @@ type EditorInternals = {
 	tui?: { requestRender?: () => void };
 };
 
+type EditorPrivateActions = {
+	addNewLine(): void;
+	submitValue(): void;
+};
+
 function cursorShapeForMode(mode: VimPromptMode): CursorShape {
 	switch (mode) {
 		case "insert":
@@ -75,6 +80,26 @@ function isDelegatedAppKey(data: string): boolean {
 	);
 }
 
+function isExplicitNewLineKey(data: string): boolean {
+	return (
+		matchesKey(data, "shift+enter") ||
+		matchesKey(data, "shift+return") ||
+		data === "\n" ||
+		data === "\x1b\r" ||
+		data === "\x1b[13;2~" ||
+		(data.charCodeAt(0) === 10 && data.length > 1) ||
+		(data.length > 1 && data.includes("\x1b") && data.includes("\r"))
+	);
+}
+
+function isPlainEnterKey(data: string): boolean {
+	return !isExplicitNewLineKey(data) && (matchesKey(data, "enter") || matchesKey(data, "return"));
+}
+
+function isCommandEnterKey(data: string): boolean {
+	return matchesKey(data, "super+enter") || matchesKey(data, "super+return");
+}
+
 function normalizeKey(data: string): VimKey | undefined {
 	if (matchesKey(data, "escape") || matchesKey(data, "ctrl+[") || data === "\x1b") return "escape";
 	if (matchesKey(data, "enter") || matchesKey(data, "return")) return "enter";
@@ -108,6 +133,10 @@ export class VimPromptEditor extends CustomEditor {
 	}
 
 	handleInput(data: string): void {
+		if (this.handlePromptEnterInput(data)) {
+			return;
+		}
+
 		if (this.engine.mode === "insert") {
 			this.handleInsertInput(data);
 			return;
@@ -135,6 +164,43 @@ export class VimPromptEditor extends CustomEditor {
 			this.applyEngineState();
 		}
 		this.applyCursorStyle();
+	}
+
+	private handlePromptEnterInput(data: string): boolean {
+		if (isCommandEnterKey(data)) {
+			this.submitPrompt();
+			return true;
+		}
+
+		if (
+			!this.isShowingAutocomplete() &&
+			this.engine.searchInput === undefined &&
+			this.isMultilinePrompt() &&
+			isPlainEnterKey(data)
+		) {
+			this.addPromptLine();
+			return true;
+		}
+
+		return false;
+	}
+
+	private isMultilinePrompt(): boolean {
+		return this.getLines().length > 1;
+	}
+
+	private addPromptLine(): void {
+		(this as unknown as EditorPrivateActions).addNewLine();
+		this.syncEngineFromEditor();
+		this.applyCursorStyle();
+		this.requestRender();
+	}
+
+	private submitPrompt(): void {
+		(this as unknown as EditorPrivateActions).submitValue();
+		this.syncEngineFromEditor();
+		this.applyCursorStyle();
+		this.requestRender();
 	}
 
 	private handleInsertInput(data: string): void {

@@ -81,7 +81,13 @@ Some Pi application-level keys are delegated to the normal prompt editor instead
 - `ctrl+l`
 - `ctrl+t`
 
-`enter`, `ctrl+c`, `ctrl+d`, and `ctrl+g` are also delegated so prompt submission and Pi-level controls continue to work.
+Prompt submission follows a single-line vs multi-line flow:
+
+- single-line prompt + `enter` submits the message;
+- after the prompt has multiple logical lines, `enter` inserts another newline;
+- multi-line prompt submission uses `cmd+enter` where the terminal reports it as `super+enter`.
+
+`ctrl+c`, `ctrl+d`, and `ctrl+g` are delegated so Pi-level controls continue to work.
 
 ## Implementation notes
 
