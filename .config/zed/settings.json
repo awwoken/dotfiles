@@ -39,6 +39,7 @@
     },
   },
   "git_panel": {
+    "group_by": "none",
     "dock": "left",
     "tree_view": true,
   },
