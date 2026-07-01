@@ -20,9 +20,14 @@ Do not put utility functions, constants, shared types, render helpers, or table/
 ## File Boundaries
 
 - For new files, keep one entity per file: one component, hook, page, API wrapper, or store.
+- Component files may contain imports, the component's props type, and the component. Do not add any other local types, interfaces, constants, utility functions, render helpers, mappers, option arrays, schemas, or secondary components to the component file just because the change is small.
+- When a change needs a helper, mapper, derived-data function, option/config object, constant, shared type, local type, schema, or secondary component, put it in an appropriately named sibling file or existing local `utils/`, `constants/`, `types`, `schemas/`, `mappers/`, `hooks/`, or feature-specific support location.
+- Do not inline ad-hoc type aliases or interfaces in component, hook, route, page, screen, API wrapper, or store files, except for the component's own props type in a component file.
+- Existing violations may remain if unrelated, but do not add to them. If the touched change needs new support code, create the correct file boundary instead of expanding the existing mixed file.
 
-- When adding reusable utilities, constants, or shared types, put them in existing local `utils/`, `constants/`, or `types` locations.
-- Do not refactor existing files just to satisfy this guidance unless the touched change would otherwise make the file worse.
+## No Small-Change Exemption
+
+These file-boundary rules apply regardless of size. A one-line helper, tiny option list, single conditional mapper, one-off render helper, or single-use type is still support code and must not be added inline to a component/hook/page/route/screen/API-wrapper/store file.
 
 ## Responsibility Placement
 

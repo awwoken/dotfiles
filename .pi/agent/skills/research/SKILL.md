@@ -10,7 +10,7 @@ description: >-
 # Research Workflow
 
 Use this skill for external research. It covers official documentation lookup,
-web discovery, indexed page reading, and public GitHub code search.
+web discovery, selected page reading, and public GitHub code search.
 
 ## Source routing
 
@@ -20,8 +20,8 @@ Choose the smallest reliable source set:
 | ------------------------------------------------------------------------------------------------------ | --------------------------------------------- | ------------------------------------------------------------------------------- |
 | Current API syntax, configuration, setup, migration, SDK/CLI behavior, library-specific debugging      | `resolve-library-id` then `query-docs`        | Prefer official docs over general web pages.                                    |
 | Broad discovery, current non-API facts, project/repo discovery, news, comparisons                      | `web_search`                                  | Discovery only. Snippets are previews, not complete evidence.                   |
-| Reading, summarizing, extracting, comparing, or verifying selected web pages                           | `ctx_fetch_and_index` then `ctx_search`       | Never dump raw web pages into context.                                          |
-| Exact remote text, source files, code formatting, indentation, raw JSON/YAML, or byte-faithful content | `curl -fsSL` via `ctx_execute` or a temp file | Use raw URLs when available; extracted web fetchers may normalize/corrupt text. |
+| Reading, summarizing, extracting, comparing, or verifying selected web pages                           | `web_fetch`                                  | Fetch only the selected relevant page(s).                                       |
+| Exact remote text, source files, code formatting, indentation, raw JSON/YAML, or byte-faithful content | `curl -fsSL` or a temp file                  | Use raw URLs when available; extracted web fetchers may normalize/corrupt text. |
 | Real-world code examples or public repository usage patterns                                           | `grep_searchGitHub` MCP tool                  | Search literal code patterns, not natural-language keywords.                    |
 
 Do not run every research route by default. Stop once the available evidence is sufficient.
@@ -138,11 +138,9 @@ Required workflow:
 
 1. Search with `web_search`.
 2. Select the relevant URL(s) from the result list.
-3. For normal page reading, summarization, verification, comparison, or extraction:
-   - fetch selected URL(s) with `ctx_fetch_and_index`, then
-   - query indexed content with `ctx_search` using task-specific queries.
+3. For normal page reading, summarization, verification, comparison, or extraction, fetch selected URL(s) with `web_fetch`.
 4. If exact text is required, use the exact-source workflow below instead.
-5. Answer from the indexed snippets or exact-source output and mention/cite selected source URLs when useful.
+5. Answer from the fetched page content or exact-source output and mention/cite selected source URLs when useful.
 
 Search snippets alone are enough only for lightweight discovery, such as listing
 candidate links or saying that relevant results exist.
@@ -157,8 +155,8 @@ Rules:
 
 - Prefer raw/source URLs over rendered pages, such as `raw.githubusercontent.com/...` instead of
   `github.com/.../blob/...`.
-- Fetch exact remote text with `curl -fsSL` through `ctx_execute` when you need to inspect, diff,
-  count, or summarize it without dumping the full file into context.
+- Fetch exact remote text with `curl -fsSL` when you need to inspect, diff, count, or summarize it;
+  filter/process large responses before returning them, or save them to a temporary file for targeted inspection.
 - If you need to edit or preserve a remote file locally, fetch it to a temporary/tracked file first,
   then use normal file tools on that file.
 - Avoid Ollama `web_fetch` and other extracted page readers for exact code/source fidelity: they may
@@ -199,7 +197,7 @@ current API behavior. Prefer official docs for normative claims.
 Use multiple routes only when they answer different parts of the task:
 
 - Docs + GitHub examples: confirm official API, then show common real-world usage.
-- Web search + fetch: discover pages, then verify from selected indexed pages.
+- Web search + fetch: discover pages, then verify from selected fetched pages.
 - Docs + web search: docs for API details, web search for ecosystem or current context.
 
 ## Output standards

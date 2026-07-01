@@ -19,8 +19,14 @@ Do not put functions, constants, interfaces, types, helper classes, or secondary
 ## File Boundaries
 
 - For new files, keep one entity per file: one class, DTO, entity, guard, service, or controller.
-- When adding reusable utilities, constants, or shared types, put them in local `utils/`, `constants/`, or `types/` locations.
-- Do not refactor existing files just to satisfy this guidance unless the touched change would otherwise make the file worse.
+- Do not add new functions, constants, interfaces, types, helper classes, secondary DTOs, or secondary entities to a service/controller/module/provider file just because the change is small.
+- When a change needs a helper, mapper, utility, constant, shared type, local type, or supporting class, put it in an appropriately named sibling file or local `utils/`, `constants/`, `types/`, `mappers/`, or feature-specific support location.
+- Do not inline ad-hoc type aliases or interfaces in implementation files. DTOs, entities, request/response shapes, and reusable/internal support types belong in their own files or established local type/schema locations.
+- Existing violations may remain if unrelated, but do not add to them. If the touched change needs new support code, create the correct file boundary instead of expanding the existing mixed file.
+
+## No Small-Change Exemption
+
+These file-boundary rules apply regardless of size. A one-line helper, one-case mapper, tiny constant, or single-use type is still support code and must not be added inline to a NestJS service, controller, module, provider, DTO, or entity file.
 
 ## Controllers and Services
 
@@ -28,7 +34,7 @@ Avoid creating god services or god controllers. If a class starts coordinating u
 
 - Extract distinct business logic into separate focused services when it represents a different responsibility, workflow, integration, or domain concept.
 - Prefer composition over large procedural methods. A service may orchestrate other focused services when that keeps responsibilities clear.
-- Do not introduce extra abstraction for trivial logic; extract only when it improves readability, ownership, or testability.
+- Do not introduce extra runtime abstraction for trivial logic, but still respect file boundaries: if trivial support code must exist, place it in the correct support file rather than inline in the class file.
 
 ## Implementation Bias
 
