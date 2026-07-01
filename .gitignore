@@ -1,2 +1,11 @@
 **/node_modules
+
 .pi/npm
+.pi/agent/npm/
+.pi/agent/auth.json
+.pi/agent/mcp-cache.json
+.pi/agent/sessions/
+.pi/agent/git/
+.pi/context-mode/
+
+.config/zed/prompts/
