@@ -2,15 +2,14 @@
   "defaultModel": "gpt-5.5",
   "defaultProvider": "openai-codex",
   "defaultThinkingLevel": "high",
-  "lastChangelogVersion": "0.79.7",
+  "lastChangelogVersion": "0.80.3",
   "collapseChangelog": true,
-  "quietStartup": true,
   "packages": [
     {
-      "source": "npm:context-mode",
-      "skills": [
-        "context-mode"
-      ]
+      "source": "npm:pi-mcp-adapter"
+    },
+    {
+      "source": "git:git@github.com:hasit/pi-community-themes.git"
     },
     {
       "source": "npm:@upstash/context7-pi",
@@ -32,6 +31,6 @@
     "diffCollapsedLines": 24,
     "diffWordWrap": true
   },
-  "theme": "minimal",
-  "hideThinkingBlock": false
+  "hideThinkingBlock": false,
+  "theme": "dark"
 }
