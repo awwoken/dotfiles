@@ -36,11 +36,13 @@ Defaults and limits:
 - maximum: `8` results
 - invalid or missing values fall back to the default
 
-Output includes numbered results with:
+Expanded output includes numbered results with:
 
 - title
 - URL
 - query-focused snippet
+
+Collapsed TUI output shows the result count and a compact title summary.
 
 Snippet behavior:
 
@@ -67,14 +69,16 @@ Defaults and limits:
 - invalid or missing values fall back to the default
 - returned links are limited to `20`
 
-Output includes:
+Expanded output includes:
 
 - page title
 - requested URL
 - normalized extracted content
 - extracted links, when provided by Ollama
 
-Long content is truncated at a word or newline boundary when possible.
+Fetched content preserves leading indentation so code blocks and preformatted text remain readable. Long content is truncated at a word or newline boundary when possible.
+
+Collapsed TUI output shows the fetched page title, content size, link count, and the configured expand key hint.
 
 ## Usage examples
 
@@ -106,6 +110,7 @@ Other non-2xx Ollama responses include the HTTP status and response body when av
 
 - The extension is loaded through the root `index.ts` shim, which exports `src/index.ts` for Pi auto-discovery.
 - `src/index.ts` registers both Pi tools.
+- `src/render.ts` owns custom collapsed and expanded TUI rendering.
 - `src/client.ts` owns the HTTP calls to Ollama.
 - `src/config.ts` clamps user-provided limits.
 - `src/format.ts`, `src/snippets.ts`, and `src/text.ts` normalize and format tool output.
