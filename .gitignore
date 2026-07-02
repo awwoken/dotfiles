@@ -1,11 +1,24 @@
 **/node_modules
 
-.pi/npm
-.pi/agent/npm/
-.pi/agent/auth.json
-.pi/agent/mcp-cache.json
-.pi/agent/sessions/
-.pi/agent/git/
-.pi/context-mode/
+.pi/**
+!.pi/
+!.pi/run.sh
+
+!.pi/agent/
+!.pi/agent/SYSTEM.md
+!.pi/agent/mcp.json
+!.pi/agent/settings.json
+!.pi/agent/tsconfig.json
+
+!.pi/agent/extensions/
+!.pi/agent/extensions/**
+
+!.pi/agent/prompts/
+!.pi/agent/prompts/**
+
+!.pi/agent/skills/
+!.pi/agent/skills/**
+
+.config/mcp/mcp.json
 
 .config/zed/prompts/
