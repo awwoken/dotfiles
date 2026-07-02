@@ -32,5 +32,8 @@
     "diffWordWrap": true
   },
   "hideThinkingBlock": false,
+  "pi-codex-fast": {
+    "enabled": true
+  },
   "theme": "dark"
 }
