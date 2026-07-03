@@ -1,89 +1,93 @@
-import type { AssistantMessage, ModelThinkingLevel, Usage } from "@earendil-works/pi-ai";
+import type {
+	AssistantMessage,
+	ModelThinkingLevel,
+	Usage,
+} from "@earendil-works/pi-ai";
 
-export type BtwStatus = "success" | "error" | "aborted";
+export type SideStatus = "success" | "error" | "aborted";
 
-export interface BtwModelMetadata {
+export interface SideModelMetadata {
 	provider: string;
 	id: string;
 	api?: string;
 }
 
-export interface BtwBranchMetadata {
+export interface SideBranchMetadata {
 	leafIdAtSnapshot?: string | null;
 }
 
-export interface BtwErrorDetails {
+export interface SideErrorDetails {
 	name?: string;
 	message: string;
 }
 
-export interface BtwTurnEntry {
+export interface SideTurnEntry {
 	schemaVersion: 1;
 	kind: "turn";
 	chatId: string;
 	turnIndex: number;
-	status: BtwStatus;
+	status: SideStatus;
 	userText: string;
 	requestedAt: string;
 	startedAt: string;
 	completedAt: string;
 	cwd: string;
-	branch: BtwBranchMetadata;
-	model: BtwModelMetadata | null;
+	branch: SideBranchMetadata;
+	model: SideModelMetadata | null;
 	thinkingLevel: ModelThinkingLevel;
 	answerText: string;
 	assistantMessage?: AssistantMessage;
 	stopReason?: string;
 	usage?: Usage;
-	error?: BtwErrorDetails;
+	error?: SideErrorDetails;
 }
 
-export interface BtwActiveEntry {
+export interface SideActiveEntry {
 	schemaVersion: 1;
 	kind: "active";
 	activeChatId: string | null;
 	changedAt: string;
 	cwd: string;
-	branch: BtwBranchMetadata;
+	branch: SideBranchMetadata;
 }
 
-export type BtwEntry = BtwTurnEntry | BtwActiveEntry;
+export type SideEntry = SideTurnEntry | SideActiveEntry;
 
-export interface BtwStoredEvent {
+export interface SideStoredEvent {
 	entryId: string;
 	parentId?: string | null;
 	timestamp: string;
-	data: BtwEntry;
+	data: SideEntry;
 }
 
-export interface BtwAttemptResult {
-	status: BtwStatus;
+export interface SideAttemptResult {
+	status: SideStatus;
 	completedAt: string;
 	answerText: string;
 	assistantMessage?: AssistantMessage;
 	stopReason?: string;
 	usage?: Usage;
-	error?: BtwErrorDetails;
+	error?: SideErrorDetails;
 }
 
-export interface BtwChat {
+export interface SideChat {
 	chatId: string;
 	title: string;
 	createdAt: string;
 	updatedAt: string;
-	model: BtwModelMetadata | null;
+	model: SideModelMetadata | null;
 	thinkingLevel: ModelThinkingLevel;
-	turns: BtwTurnEntry[];
+	turns: SideTurnEntry[];
 	transient?: boolean;
 }
 
-export interface BtwRunningTurn {
+export interface SideRunningTurn {
 	chatId: string;
 	turnIndex: number;
 	userText: string;
 	requestedAt: string;
 	startedAt: string;
-	model: BtwModelMetadata | null;
+	model: SideModelMetadata | null;
 	thinkingLevel: ModelThinkingLevel;
 	answerText: string;
 	status: "running";

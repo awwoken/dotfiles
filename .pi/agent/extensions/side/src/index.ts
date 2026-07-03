@@ -1,15 +1,32 @@
-import type { ExtensionAPI, ExtensionCommandContext } from "@earendil-works/pi-coding-agent";
-import type { Model, ModelThinkingLevel, ThinkingLevel } from "@earendil-works/pi-ai";
+import type {
+	ExtensionAPI,
+	ExtensionCommandContext,
+} from "@earendil-works/pi-coding-agent";
+import type {
+	Model,
+	ModelThinkingLevel,
+	ThinkingLevel,
+} from "@earendil-works/pi-ai";
 import { randomUUID } from "node:crypto";
 
-import { ABOUT_COMMAND, ALSO_COMMAND, BTW_COMMAND, UNBTW_COMMAND } from "./constants.ts";
-import { loadBtwConfig } from "./config.ts";
-import { appendBtwEntry } from "./entries.ts";
-import { buildBtwPayload } from "./prompt.ts";
-import { BtwState } from "./state.ts";
-import { runBtwStream } from "./stream.ts";
-import { showAbout, updateBtwWidget } from "./ui.ts";
-import type { BtwActiveEntry, BtwAttemptResult, BtwModelMetadata, BtwTurnEntry } from "./types.ts";
+import {
+	ABOUT_COMMAND,
+	ALSO_COMMAND,
+	SIDE_COMMAND,
+	UNSIDE_COMMAND,
+} from "./constants.ts";
+import { loadSideConfig } from "./config.ts";
+import { appendSideEntry } from "./entries.ts";
+import { buildSidePayload } from "./prompt.ts";
+import { SideState } from "./state.ts";
+import { runSideStream } from "./stream.ts";
+import { showAbout, updateSideWidget } from "./ui.ts";
+import type {
+	SideActiveEntry,
+	SideAttemptResult,
+	SideModelMetadata,
+	SideTurnEntry,
+} from "./types.ts";
 
 interface ActiveRun {
 	chatId: string;
@@ -19,7 +36,7 @@ interface ActiveRun {
 	startedAt: string;
 	cwd: string;
 	leafIdAtSnapshot: string | null;
-	model: BtwModelMetadata | null;
+	model: SideModelMetadata | null;
 	thinkingLevel: ModelThinkingLevel;
 	abortController: AbortController;
 	abortDisposition: "keep-active" | "deactivate";
@@ -27,7 +44,9 @@ interface ActiveRun {
 	done: Promise<void>;
 }
 
-function modelMetadata(model: Model<any> | undefined): BtwModelMetadata | null {
+function modelMetadata(
+	model: Model<any> | undefined,
+): SideModelMetadata | null {
 	if (!model) return null;
 	return {
 		provider: model.provider,
@@ -36,11 +55,13 @@ function modelMetadata(model: Model<any> | undefined): BtwModelMetadata | null {
 	};
 }
 
-function streamReasoningLevel(thinkingLevel: ModelThinkingLevel): ThinkingLevel | undefined {
+function streamReasoningLevel(
+	thinkingLevel: ModelThinkingLevel,
+): ThinkingLevel | undefined {
 	return thinkingLevel === "off" ? undefined : thinkingLevel;
 }
 
-function immediateError(message: string): BtwAttemptResult {
+function immediateError(message: string): SideAttemptResult {
 	return {
 		status: "error",
 		completedAt: new Date().toISOString(),
@@ -49,14 +70,21 @@ function immediateError(message: string): BtwAttemptResult {
 	};
 }
 
-function requireInteractiveUi(ctx: ExtensionCommandContext, command: string): boolean {
+function requireInteractiveUi(
+	ctx: ExtensionCommandContext,
+	command: string,
+): boolean {
 	if (ctx.hasUI) return true;
 	ctx.ui.notify(`/${command} requires interactive UI`, "error");
 	return false;
 }
 
-function appendActiveEntry(pi: ExtensionAPI, ctx: ExtensionCommandContext, activeChatId: string | null): void {
-	const data: BtwActiveEntry = {
+function appendActiveEntry(
+	pi: ExtensionAPI,
+	ctx: ExtensionCommandContext,
+	activeChatId: string | null,
+): void {
+	const data: SideActiveEntry = {
 		schemaVersion: 1,
 		kind: "active",
 		activeChatId,
@@ -64,10 +92,13 @@ function appendActiveEntry(pi: ExtensionAPI, ctx: ExtensionCommandContext, activ
 		cwd: ctx.cwd,
 		branch: { leafIdAtSnapshot: ctx.sessionManager.getLeafId() },
 	};
-	appendBtwEntry(pi, data);
+	appendSideEntry(pi, data);
 }
 
-function buildTurnEntry(run: ActiveRun, result: BtwAttemptResult): BtwTurnEntry {
+function buildTurnEntry(
+	run: ActiveRun,
+	result: SideAttemptResult,
+): SideTurnEntry {
 	return {
 		schemaVersion: 1,
 		kind: "turn",
@@ -90,18 +121,21 @@ function buildTurnEntry(run: ActiveRun, result: BtwAttemptResult): BtwTurnEntry 
 	};
 }
 
-function resolveStoredModel(ctx: ExtensionCommandContext, model: BtwModelMetadata | null): Model<any> | undefined {
+function resolveStoredModel(
+	ctx: ExtensionCommandContext,
+	model: SideModelMetadata | null,
+): Model<any> | undefined {
 	if (!model) return undefined;
 	return ctx.modelRegistry.find(model.provider, model.id);
 }
 
-export default function btwExtension(pi: ExtensionAPI) {
-	const config = loadBtwConfig();
-	const state = new BtwState();
+export default function sideExtension(pi: ExtensionAPI) {
+	const config = loadSideConfig();
+	const state = new SideState();
 	let activeRun: ActiveRun | null = null;
 
 	function render(ctx: ExtensionCommandContext): void {
-		updateBtwWidget(ctx, {
+		updateSideWidget(ctx, {
 			chat: state.getActiveChat(),
 			latestTurn: state.getLatestTurnForDisplay(),
 			expanded: state.isExpanded(),
@@ -109,7 +143,10 @@ export default function btwExtension(pi: ExtensionAPI) {
 		});
 	}
 
-	async function abortActiveRun(ctx: ExtensionCommandContext, disposition: ActiveRun["abortDisposition"]): Promise<void> {
+	async function abortActiveRun(
+		ctx: ExtensionCommandContext,
+		disposition: ActiveRun["abortDisposition"],
+	): Promise<void> {
 		const run = activeRun;
 		if (!run) return;
 		run.abortDisposition = disposition;
@@ -123,17 +160,25 @@ export default function btwExtension(pi: ExtensionAPI) {
 		chatId: string;
 		turnIndex: number;
 		userText: string;
-		modelMetadata: BtwModelMetadata | null;
+		modelMetadata: SideModelMetadata | null;
 		model: Model<any> | undefined;
 		thinkingLevel: ModelThinkingLevel;
 		ensureActiveAfterPersist: boolean;
 	}): void {
-		const { ctx, chatId, turnIndex, userText, model, thinkingLevel, ensureActiveAfterPersist } = options;
+		const {
+			ctx,
+			chatId,
+			turnIndex,
+			userText,
+			model,
+			thinkingLevel,
+			ensureActiveAfterPersist,
+		} = options;
 		const requestedAt = new Date().toISOString();
 		const startedAt = new Date().toISOString();
 		const abortController = new AbortController();
 		const priorTurns = state.getSuccessfulTurns(chatId);
-		const payload = buildBtwPayload(ctx, userText, priorTurns);
+		const payload = buildSidePayload(ctx, userText, priorTurns);
 
 		state.setRunningTurn({
 			chatId,
@@ -166,7 +211,7 @@ export default function btwExtension(pi: ExtensionAPI) {
 
 		run.done = (async () => {
 			const result = model
-				? await runBtwStream({
+				? await runSideStream({
 						ctx,
 						model,
 						payload,
@@ -178,12 +223,19 @@ export default function btwExtension(pi: ExtensionAPI) {
 							render(ctx);
 						},
 					})
-				: immediateError(run.model ? `Model ${run.model.provider}/${run.model.id} is unavailable or missing an API key` : "No active model selected");
+				: immediateError(
+						run.model
+							? `Model ${run.model.provider}/${run.model.id} is unavailable or missing an API key`
+							: "No active model selected",
+					);
 
-			appendBtwEntry(pi, buildTurnEntry(run, result));
+			appendSideEntry(pi, buildTurnEntry(run, result));
 			if (run.abortDisposition === "deactivate") {
 				appendActiveEntry(pi, ctx, null);
-			} else if (run.ensureActiveAfterPersist || state.getActiveChatId() === run.chatId) {
+			} else if (
+				run.ensureActiveAfterPersist ||
+				state.getActiveChatId() === run.chatId
+			) {
 				appendActiveEntry(pi, ctx, run.chatId);
 			}
 
@@ -194,7 +246,7 @@ export default function btwExtension(pi: ExtensionAPI) {
 			render(ctx);
 		})().catch((error) => {
 			const message = error instanceof Error ? error.message : String(error);
-			ctx.ui.notify(`btw failed: ${message}`, "error");
+			ctx.ui.notify(`side failed: ${message}`, "error");
 			if (activeRun === run) {
 				activeRun = null;
 				state.setRunningTurn(null);
@@ -207,7 +259,7 @@ export default function btwExtension(pi: ExtensionAPI) {
 
 	pi.on("session_start", async (_event, ctx) => {
 		state.rebuild(ctx);
-		updateBtwWidget(ctx, {
+		updateSideWidget(ctx, {
 			chat: state.getActiveChat(),
 			latestTurn: state.getLatestTurnForDisplay(),
 			expanded: state.isExpanded(),
@@ -221,11 +273,11 @@ export default function btwExtension(pi: ExtensionAPI) {
 	});
 
 	pi.registerShortcut(config.toggleShortcut, {
-		description: "Toggle btw widget expansion",
+		description: "Toggle side widget expansion",
 		handler: async (ctx) => {
 			if (!ctx.hasUI) return;
 			state.toggleExpanded();
-			updateBtwWidget(ctx, {
+			updateSideWidget(ctx, {
 				chat: state.getActiveChat(),
 				latestTurn: state.getLatestTurnForDisplay(),
 				expanded: state.isExpanded(),
@@ -234,14 +286,14 @@ export default function btwExtension(pi: ExtensionAPI) {
 		},
 	});
 
-	pi.registerCommand(BTW_COMMAND, {
-		description: "Start a new active btw side chat",
+	pi.registerCommand(SIDE_COMMAND, {
+		description: "Start a new active side chat",
 		handler: async (args, ctx) => {
-			if (!requireInteractiveUi(ctx, BTW_COMMAND)) return;
+			if (!requireInteractiveUi(ctx, SIDE_COMMAND)) return;
 
 			const userText = args.trim();
 			if (!userText) {
-				ctx.ui.notify("Usage: /btw <message>", "warning");
+				ctx.ui.notify("Usage: /side <message>", "warning");
 				return;
 			}
 
@@ -279,7 +331,7 @@ export default function btwExtension(pi: ExtensionAPI) {
 	});
 
 	pi.registerCommand(ALSO_COMMAND, {
-		description: "Ask a follow-up in the active btw side chat",
+		description: "Ask a follow-up in the active side chat",
 		handler: async (args, ctx) => {
 			if (!requireInteractiveUi(ctx, ALSO_COMMAND)) return;
 
@@ -290,13 +342,19 @@ export default function btwExtension(pi: ExtensionAPI) {
 			}
 
 			if (activeRun) {
-				ctx.ui.notify("A btw response is already running. Wait for it to finish or use /btw to replace it.", "warning");
+				ctx.ui.notify(
+					"A side response is already running. Wait for it to finish or use /side to replace it.",
+					"warning",
+				);
 				return;
 			}
 
 			const chat = state.getActiveChat();
 			if (!chat) {
-				ctx.ui.notify("No active btw. Use /btw <message> to start one.", "warning");
+				ctx.ui.notify(
+					"No active side chat. Use /side <message> to start one.",
+					"warning",
+				);
 				return;
 			}
 
@@ -313,13 +371,13 @@ export default function btwExtension(pi: ExtensionAPI) {
 		},
 	});
 
-	pi.registerCommand(UNBTW_COMMAND, {
-		description: "Stop the active btw side chat",
+	pi.registerCommand(UNSIDE_COMMAND, {
+		description: "Stop the active side chat",
 		handler: async (_args, ctx) => {
-			if (!requireInteractiveUi(ctx, UNBTW_COMMAND)) return;
+			if (!requireInteractiveUi(ctx, UNSIDE_COMMAND)) return;
 
 			if (!state.getActiveChat() && !activeRun) {
-				ctx.ui.notify("No active btw to stop", "warning");
+				ctx.ui.notify("No active side chat to stop", "warning");
 				return;
 			}
 
@@ -335,16 +393,23 @@ export default function btwExtension(pi: ExtensionAPI) {
 	});
 
 	pi.registerCommand(ABOUT_COMMAND, {
-		description: "List and activate btw side chats on the current branch",
+		description: "List and activate side chats on the current branch",
 		handler: async (_args, ctx) => {
 			if (!requireInteractiveUi(ctx, ABOUT_COMMAND)) return;
 			if (activeRun) {
-				ctx.ui.notify("A btw response is running. Wait for it to finish or stop it with /unbtw before using /about.", "warning");
+				ctx.ui.notify(
+					"A side response is running. Wait for it to finish or stop it with /unside before using /about.",
+					"warning",
+				);
 				return;
 			}
 
 			const chats = state.rebuild(ctx);
-			const selectedChatId = await showAbout(ctx, chats, state.getActiveChatId());
+			const selectedChatId = await showAbout(
+				ctx,
+				chats,
+				state.getActiveChatId(),
+			);
 			if (!selectedChatId) return;
 
 			appendActiveEntry(pi, ctx, selectedChatId);

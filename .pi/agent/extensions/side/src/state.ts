@@ -1,15 +1,20 @@
 import type { ExtensionContext } from "@earendil-works/pi-coding-agent";
 
-import { collectCurrentBranchBtwEvents } from "./entries.ts";
-import type { BtwChat, BtwModelMetadata, BtwRunningTurn, BtwTurnEntry } from "./types.ts";
+import { collectCurrentBranchSideEvents } from "./entries.ts";
+import type {
+	SideChat,
+	SideModelMetadata,
+	SideRunningTurn,
+	SideTurnEntry,
+} from "./types.ts";
 import type { ModelThinkingLevel } from "@earendil-works/pi-ai";
 
 function titleFromText(text: string): string {
 	const normalized = text.replace(/\s+/g, " ").trim();
-	return normalized || "Untitled btw";
+	return normalized || "Untitled side chat";
 }
 
-function addTurn(chats: Map<string, BtwChat>, turn: BtwTurnEntry): void {
+function addTurn(chats: Map<string, SideChat>, turn: SideTurnEntry): void {
 	let chat = chats.get(turn.chatId);
 	if (!chat) {
 		chat = {
@@ -25,19 +30,22 @@ function addTurn(chats: Map<string, BtwChat>, turn: BtwTurnEntry): void {
 	}
 
 	chat.turns.push(turn);
-	chat.turns.sort((a, b) => a.turnIndex - b.turnIndex || a.startedAt.localeCompare(b.startedAt));
+	chat.turns.sort(
+		(a, b) =>
+			a.turnIndex - b.turnIndex || a.startedAt.localeCompare(b.startedAt),
+	);
 	chat.updatedAt = turn.completedAt;
 }
 
-export class BtwState {
-	private chats = new Map<string, BtwChat>();
+export class SideState {
+	private chats = new Map<string, SideChat>();
 	private activeChatId: string | null = null;
-	private runningTurn: BtwRunningTurn | null = null;
+	private runningTurn: SideRunningTurn | null = null;
 	private expanded = false;
 
-	rebuild(ctx: ExtensionContext): BtwChat[] {
-		const events = collectCurrentBranchBtwEvents(ctx);
-		const chats = new Map<string, BtwChat>();
+	rebuild(ctx: ExtensionContext): SideChat[] {
+		const events = collectCurrentBranchSideEvents(ctx);
+		const chats = new Map<string, SideChat>();
 		let activeChatId: string | null = null;
 
 		for (const event of events) {
@@ -58,11 +66,13 @@ export class BtwState {
 		return this.getChats();
 	}
 
-	getChats(): BtwChat[] {
-		return [...this.chats.values()].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+	getChats(): SideChat[] {
+		return [...this.chats.values()].sort((a, b) =>
+			b.updatedAt.localeCompare(a.updatedAt),
+		);
 	}
 
-	getChat(chatId: string): BtwChat | null {
+	getChat(chatId: string): SideChat | null {
 		return this.chats.get(chatId) ?? null;
 	}
 
@@ -70,7 +80,7 @@ export class BtwState {
 		return this.activeChatId;
 	}
 
-	getActiveChat(): BtwChat | null {
+	getActiveChat(): SideChat | null {
 		return this.activeChatId ? this.getChat(this.activeChatId) : null;
 	}
 
@@ -87,10 +97,10 @@ export class BtwState {
 		chatId: string;
 		userText: string;
 		createdAt: string;
-		model: BtwModelMetadata | null;
+		model: SideModelMetadata | null;
 		thinkingLevel: ModelThinkingLevel;
-	}): BtwChat {
-		const chat: BtwChat = {
+	}): SideChat {
+		const chat: SideChat = {
 			chatId: options.chatId,
 			title: titleFromText(options.userText),
 			createdAt: options.createdAt,
@@ -109,7 +119,7 @@ export class BtwState {
 		return this.getChat(chatId)?.turns.length ?? 0;
 	}
 
-	setRunningTurn(turn: BtwRunningTurn | null): void {
+	setRunningTurn(turn: SideRunningTurn | null): void {
 		this.runningTurn = turn;
 	}
 
@@ -118,7 +128,7 @@ export class BtwState {
 		this.runningTurn.answerText = answerText;
 	}
 
-	getRunningTurn(): BtwRunningTurn | null {
+	getRunningTurn(): SideRunningTurn | null {
 		return this.runningTurn;
 	}
 
@@ -126,7 +136,7 @@ export class BtwState {
 		return !!this.runningTurn;
 	}
 
-	getLatestTurnForDisplay(): BtwRunningTurn | BtwTurnEntry | null {
+	getLatestTurnForDisplay(): SideRunningTurn | SideTurnEntry | null {
 		if (this.runningTurn && this.runningTurn.chatId === this.activeChatId) {
 			return this.runningTurn;
 		}
@@ -136,8 +146,10 @@ export class BtwState {
 		return chat.turns[chat.turns.length - 1] ?? null;
 	}
 
-	getSuccessfulTurns(chatId: string): BtwTurnEntry[] {
-		return (this.getChat(chatId)?.turns ?? []).filter((turn) => turn.status === "success");
+	getSuccessfulTurns(chatId: string): SideTurnEntry[] {
+		return (this.getChat(chatId)?.turns ?? []).filter(
+			(turn) => turn.status === "success",
+		);
 	}
 
 	isExpanded(): boolean {

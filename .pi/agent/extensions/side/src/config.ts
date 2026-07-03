@@ -4,17 +4,17 @@ import { join } from "node:path";
 
 import type { KeyId } from "@earendil-works/pi-tui";
 
-import { DEFAULT_BTW_TOGGLE_SHORTCUT } from "./constants.ts";
+import { DEFAULT_SIDE_TOGGLE_SHORTCUT } from "./constants.ts";
 
-interface BtwSettings {
+interface SideSettings {
 	toggleShortcut?: unknown;
 }
 
 interface PiSettings {
-	btw?: BtwSettings;
+	side?: SideSettings;
 }
 
-export interface BtwConfig {
+export interface SideConfig {
 	toggleShortcut: KeyId;
 }
 
@@ -30,17 +30,22 @@ function readSettings(path: string): PiSettings {
 }
 
 function getToggleShortcut(settings: PiSettings): KeyId | undefined {
-	const value = settings.btw?.toggleShortcut;
+	const value = settings.side?.toggleShortcut;
 	if (typeof value !== "string") return undefined;
 	const trimmed = value.trim();
 	return (trimmed as KeyId) || undefined;
 }
 
-export function loadBtwConfig(cwd = process.cwd()): BtwConfig {
-	const globalSettings = readSettings(join(homedir(), ".pi", "agent", "settings.json"));
+export function loadSideConfig(cwd = process.cwd()): SideConfig {
+	const globalSettings = readSettings(
+		join(homedir(), ".pi", "agent", "settings.json"),
+	);
 	const projectSettings = readSettings(join(cwd, ".pi", "settings.json"));
 
 	return {
-		toggleShortcut: getToggleShortcut(projectSettings) ?? getToggleShortcut(globalSettings) ?? (DEFAULT_BTW_TOGGLE_SHORTCUT as KeyId),
+		toggleShortcut:
+			getToggleShortcut(projectSettings) ??
+			getToggleShortcut(globalSettings) ??
+			(DEFAULT_SIDE_TOGGLE_SHORTCUT as KeyId),
 	};
 }
