@@ -35,5 +35,5 @@
   "pi-codex-fast": {
     "enabled": true
   },
-  "theme": "dark"
+  "theme": "gruvbox-dark-hard"
 }

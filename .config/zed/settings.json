@@ -46,11 +46,12 @@
   "minimum_contrast_for_highlights": 45.0,
   "text_rendering_mode": "platform_default",
   "theme": {
+    "mode": "dark",
     "light": "One Light",
-    "dark": "One Dark",
+    "dark": "Gruvbox Dark Hard",
   },
   "icon_theme": {
-    "mode": "light",
+    "mode": "dark",
     "light": "Zed (Default)",
     "dark": "Zed (Default)",
   },
