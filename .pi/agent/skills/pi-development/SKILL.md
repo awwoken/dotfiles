@@ -68,6 +68,17 @@ Avoid coupling extensions directly to each other. Extensions should remain gener
 
 When multiple extensions need to participate in one workflow, describe or encode that workflow in a skill instead of hardwiring the extensions together.
 
+## Extension Tool Rendering
+
+When implementing new Pi extension tools, include collapsed TUI rendering by default unless there is a clear reason not to.
+
+- Provide `renderCall` and `renderResult` for user-facing tools.
+- Keep the collapsed view compact: show the action, target, status, and small counts/IDs when useful.
+- Show full tool output only when `expanded` is true; preserve the tool's model-facing `content` unchanged.
+- Handle `isPartial` and error states without assuming structured `details` are present.
+- Use `keyHint("app.tools.expand", "expand")` for expand hints when appropriate.
+- Put shared renderer logic in a focused rendering module when an extension has multiple tools, keeping `index.ts` mostly composition and registration.
+
 ## Skill Design
 
 Skills should be small, reusable, and triggerable.
