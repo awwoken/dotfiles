@@ -20,6 +20,15 @@ import {
 import { clampNumber, resolveRepo, runGh, runGhJson, runGhJsonAllowingExitCodes } from "./gh.ts";
 import { addReaction, fetchReviewThreads, replyToThread, setThreadResolved } from "./graphql.ts";
 import {
+  prChecksRenderer,
+  prReactRenderer,
+  prReviewSubmitRenderer,
+  prThreadReplyRenderer,
+  prThreadResolveRenderer,
+  prThreadsRenderer,
+  prViewRenderer,
+} from "./render.ts";
+import {
   GitHubPrChecksParams,
   GitHubPrReactParams,
   GitHubPrReviewSubmitParams,
@@ -109,6 +118,7 @@ export default function githubExtension(pi: ExtensionAPI) {
     promptSnippet: "Get concise Markdown details for one GitHub pull request.",
     promptGuidelines,
     parameters: GitHubPrViewParams,
+    ...prViewRenderer,
     async execute(_toolCallId, params, signal, _onUpdate, ctx) {
       const filesLimit = clampNumber(params.files_limit, DEFAULT_FILES_LIMIT, MAX_FILES_LIMIT);
       const includeBody = params.include_body !== false;
@@ -133,6 +143,7 @@ export default function githubExtension(pi: ExtensionAPI) {
     promptSnippet: "Summarize GitHub PR checks/statuses in compact Markdown.",
     promptGuidelines,
     parameters: GitHubPrChecksParams,
+    ...prChecksRenderer,
     async execute(_toolCallId, params, signal, _onUpdate, ctx) {
       const args = ["pr", "checks", String(Math.trunc(params.number)), "--json", PR_CHECK_FIELDS];
       addOptionalRepo(args, params.repo);
@@ -154,6 +165,7 @@ export default function githubExtension(pi: ExtensionAPI) {
     promptSnippet: "Submit a GitHub PR review action: approve, request_changes, or comment.",
     promptGuidelines,
     parameters: GitHubPrReviewSubmitParams,
+    ...prReviewSubmitRenderer,
     async execute(_toolCallId, params, signal, _onUpdate, ctx) {
       const action = params.event as ReviewAction;
       const submission: ReviewSubmission = { action, number: Math.trunc(params.number), repo: params.repo, body: params.body };
@@ -172,6 +184,7 @@ export default function githubExtension(pi: ExtensionAPI) {
     promptSnippet: "List GitHub PR review threads with filters and Markdown output.",
     promptGuidelines,
     parameters: GitHubPrThreadsParams,
+    ...prThreadsRenderer,
     async execute(_toolCallId, params, signal, _onUpdate, ctx) {
       const repository = await resolveRepo(pi, ctx.cwd, params.repo, signal);
       const result = await fetchReviewThreads(
@@ -209,6 +222,7 @@ export default function githubExtension(pi: ExtensionAPI) {
     promptSnippet: "Reply to a GitHub PR review thread by GraphQL thread ID.",
     promptGuidelines,
     parameters: GitHubPrThreadReplyParams,
+    ...prThreadReplyRenderer,
     async execute(_toolCallId, params, signal, _onUpdate, ctx) {
       const reply = await replyToThread(pi, ctx.cwd, params.thread_id, params.body, signal);
       return {
@@ -225,6 +239,7 @@ export default function githubExtension(pi: ExtensionAPI) {
     promptSnippet: "Add a GitHub reaction by GraphQL subject node ID.",
     promptGuidelines,
     parameters: GitHubPrReactParams,
+    ...prReactRenderer,
     async execute(_toolCallId, params, signal, _onUpdate, ctx) {
       const reaction = await addReaction(pi, ctx.cwd, params.subject_id, params.reaction, signal);
       return {
@@ -241,6 +256,7 @@ export default function githubExtension(pi: ExtensionAPI) {
     promptSnippet: "Resolve or unresolve a GitHub PR review thread by GraphQL thread ID.",
     promptGuidelines,
     parameters: GitHubPrThreadResolveParams,
+    ...prThreadResolveRenderer,
     async execute(_toolCallId, params, signal, _onUpdate, ctx) {
       const desiredResolved = params.resolved !== false;
       const thread = await setThreadResolved(pi, ctx.cwd, params.thread_id, desiredResolved, signal);
