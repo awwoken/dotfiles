@@ -1,0 +1,52 @@
+#!/usr/bin/env sh
+
+# Layout
+yabai -m config layout bsp
+yabai -m config auto_balance off
+yabai -m config split_ratio 0.50
+yabai -m config window_placement second_child
+
+# Gaps
+yabai -m config window_gap 14
+yabai -m config left_padding 10
+yabai -m config right_padding 10
+yabai -m config top_padding 6
+yabai -m config bottom_padding 10
+
+# Mouse controls
+yabai -m config mouse_modifier fn
+yabai -m config mouse_action1 move
+yabai -m config mouse_action2 resize
+yabai -m config mouse_drop_action swap
+
+# Space labels
+yabai -m space 1  --label 1
+yabai -m space 2  --label 2
+yabai -m space 3  --label 3
+yabai -m space 4  --label 4
+yabai -m space 5  --label 5
+
+yabai -m space 6  --label q
+yabai -m space 7  --label w
+yabai -m space 8  --label e
+yabai -m space 9  --label r
+
+yabai -m space 10 --label a
+yabai -m space 11 --label s
+yabai -m space 12 --label d
+yabai -m space 13 --label f
+
+yabai -m space 14 --label z
+yabai -m space 15 --label x
+yabai -m space 16 --label c
+
+# Float utility apps
+yabai -m rule --add app='^System Settings$' manage=off
+yabai -m rule --add app='^Calculator$' manage=off
+
+# Work around native tab layout changes
+yabai -m signal --add app='^(Ghostty|Finder)$' event=window_created \
+  action='yabai -m space --layout bsp'
+
+yabai -m signal --add app='^(Ghostty|Finder)$' event=window_destroyed \
+  action='yabai -m space --layout bsp'
