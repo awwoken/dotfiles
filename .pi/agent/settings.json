@@ -1,8 +1,8 @@
 {
-  "defaultModel": "gpt-5.5",
+  "defaultModel": "gpt-5.6-luna",
   "defaultProvider": "openai-codex",
   "defaultThinkingLevel": "high",
-  "lastChangelogVersion": "0.80.3",
+  "lastChangelogVersion": "0.80.6",
   "collapseChangelog": true,
   "packages": [
     {
@@ -33,7 +33,7 @@
   },
   "hideThinkingBlock": false,
   "pi-codex-fast": {
-    "enabled": true
+    "enabled": false
   },
   "theme": "gruvbox-dark-hard"
 }
