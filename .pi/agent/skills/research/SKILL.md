@@ -9,8 +9,13 @@ description: >-
 
 # Research Workflow
 
-Use this skill for external research. It covers official documentation lookup,
-web discovery, selected page reading, and public GitHub code search.
+Use this skill for external research. Web search and page extraction are provided
+by [`pi-web-access`](https://github.com/nicobailon/pi-web-access), which exposes
+`web_search`, `fetch_content`, and `get_search_content`. Do not rely on the
+removed local web-search extension or assume a `web_fetch` tool exists.
+
+The workflow covers official documentation lookup, web discovery, selected page
+reading, and public GitHub code inspection.
 
 ## Source routing
 
@@ -19,10 +24,10 @@ Choose the smallest reliable source set:
 | Need                                                                                                   | Use                                           | Notes                                                                           |
 | ------------------------------------------------------------------------------------------------------ | --------------------------------------------- | ------------------------------------------------------------------------------- |
 | Current API syntax, configuration, setup, migration, SDK/CLI behavior, library-specific debugging      | `resolve-library-id` then `query-docs`        | Prefer official docs over general web pages.                                    |
-| Broad discovery, current non-API facts, project/repo discovery, news, comparisons                      | `web_search`                                  | Discovery only. Snippets are previews, not complete evidence.                   |
-| Reading, summarizing, extracting, comparing, or verifying selected web pages                           | `web_fetch`                                  | Fetch only the selected relevant page(s).                                       |
-| Exact remote text, source files, code formatting, indentation, raw JSON/YAML, or byte-faithful content | `curl -fsSL` or a temp file                  | Use raw URLs when available; extracted web fetchers may normalize/corrupt text. |
-| Real-world code examples or public repository usage patterns                                           | `grep_searchGitHub` MCP tool                  | Search literal code patterns, not natural-language keywords.                    |
+| Broad discovery, current non-API facts, project/repo discovery, news, comparisons                      | `web_search` via `pi-web-access`             | Discovery only. Snippets are previews, not complete evidence.                   |
+| Reading, summarizing, extracting, comparing, or verifying selected web pages                           | `fetch_content` via `pi-web-access`          | Fetch only the selected relevant page(s).                                       |
+| Exact remote text, source files, code formatting, indentation, raw JSON/YAML, or byte-faithful content | `curl -fsSL` or a temp file                  | Use raw URLs when available; extracted page readers may normalize content.      |
+| Real-world code examples or public repository usage patterns                                           | `fetch_content` on GitHub + `read`/`bash`    | GitHub URLs are cloned locally for exact source inspection.                     |
 
 Do not run every research route by default. Stop once the available evidence is sufficient.
 
@@ -131,16 +136,19 @@ Error handling:
 
 ## Web discovery and page reading
 
-Use `web_search` for discovery only. It returns compact titles, URLs, and snippets.
-Treat snippets as candidates, not authoritative source material for detailed claims.
+Use `web_search` from `pi-web-access` for discovery only. It returns synthesized
+results with source citations (or raw results when `workflow: "none"` is used).
+Treat snippets and summaries as candidates, not authoritative source material for
+detailed claims.
 
 Required workflow:
 
 1. Search with `web_search`.
 2. Select the relevant URL(s) from the result list.
-3. For normal page reading, summarization, verification, comparison, or extraction, fetch selected URL(s) with `web_fetch`.
-4. If exact text is required, use the exact-source workflow below instead.
-5. Answer from the fetched page content or exact-source output and mention/cite selected source URLs when useful.
+3. For normal page reading, summarization, verification, comparison, or extraction, fetch selected URL(s) with `fetch_content`.
+4. If the selected result came from a search with `includeContent: true`, use `get_search_content` to retrieve stored full content when needed.
+5. If exact text is required, use the exact-source workflow below instead.
+6. Answer from the fetched page content or exact-source output and mention/cite selected source URLs when useful.
 
 Search snippets alone are enough only for lightweight discovery, such as listing
 candidate links or saying that relevant results exist.
@@ -159,10 +167,10 @@ Rules:
   filter/process large responses before returning them, or save them to a temporary file for targeted inspection.
 - If you need to edit or preserve a remote file locally, fetch it to a temporary/tracked file first,
   then use normal file tools on that file.
-- Avoid Ollama `web_fetch` and other extracted page readers for exact code/source fidelity: they may
-  normalize whitespace, flatten indentation, remove HTML-like angle-bracket text, or omit content.
-- For GitHub code examples discovered by search, use `grep_searchGitHub` for usage patterns; use raw
-  HTTP fetching only when you need the complete exact file.
+- Avoid extracted page readers for exact code/source fidelity: they may normalize whitespace, flatten
+  indentation, remove HTML-like angle-bracket text, or omit content.
+- For GitHub code examples, use `fetch_content` on the repository or file URL. It clones repositories
+  locally for inspection; use raw HTTP fetching only when you need the complete exact file.
 
 Do not:
 
@@ -170,12 +178,14 @@ Do not:
 - Do not ask the user which URL to fetch when the task clearly implies reading the most relevant result(s).
 - Do not treat web snippets as authoritative enough for detailed claims.
 
-## Real-world GitHub code search
+## Real-world GitHub code inspection
 
-Use `grep_searchGitHub` when implementation examples or public usage patterns are
-needed. This is grep-like code search, not keyword search.
+Use `fetch_content` from `pi-web-access` on the GitHub repository or file URL.
+GitHub repositories are cloned locally, returning a local path that can be
+explored with `read`, `find`, and `bash`.
 
-Search for code that would literally appear in files:
+For implementation examples, search for code that would literally appear in
+files rather than natural-language concepts:
 
 - Good: `createAgentSession(`
 - Good: `import { createAgentSession`
@@ -184,10 +194,6 @@ Search for code that would literally appear in files:
 - Bad: `best pi examples`
 - Bad: `react auth tutorial`
 - Bad: `how to use sessions`
-
-Use filters such as `language`, `repo`, and `path` when they reduce noise. Use
-`useRegexp=true` for flexible multi-line patterns and `matchCase=true` when case
-matters.
 
 Treat GitHub examples as evidence of common usage, not proof of correct or
 current API behavior. Prefer official docs for normative claims.
