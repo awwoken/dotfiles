@@ -23,5 +23,8 @@
     "configPath": "mcp.json",
     "prefixTools": true
   },
+  "pi-codex-fast": {
+    "enabled": true
+  },
   "theme": "gruvbox-dark-hard"
 }
