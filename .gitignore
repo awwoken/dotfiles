@@ -1,24 +1,4 @@
 **/node_modules
 
-.pi/**
-!.pi/
-!.pi/run.sh
-
-!.pi/agent/
-!.pi/agent/SYSTEM.md
-!.pi/agent/mcp.json
-!.pi/agent/settings.json
-!.pi/agent/tsconfig.json
-
-!.pi/agent/extensions/
-!.pi/agent/extensions/**
-
-!.pi/agent/prompts/
-!.pi/agent/prompts/**
-
-!.pi/agent/skills/
-!.pi/agent/skills/**
-
 .config/mcp/mcp.json
-
 .config/zed/prompts/

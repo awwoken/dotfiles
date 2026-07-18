@@ -4,11 +4,17 @@
   "defaultThinkingLevel": "high",
   "lastChangelogVersion": "0.80.10",
   "collapseChangelog": true,
+  "doubleEscapeAction": "tree",
+  "treeFilterMode": "user-only",
+  "branchSummary": {
+    "skipPrompt": true
+  },
   "packages": [
     "git:git@github.com:hasit/pi-community-themes.git",
     "npm:pi-mcp-adapter",
     "npm:pi-web-access",
     "npm:pi-subagents",
+    "npm:pi-sandbox",
     "npm:pi-tool-display",
     "git:git@github.com:calesennett/pi-codex-fast.git",
     "npm:@upstash/context7-pi"
@@ -17,6 +23,5 @@
     "configPath": "mcp.json",
     "prefixTools": true
   },
-  "hideThinkingBlock": false,
   "theme": "gruvbox-dark-hard"
 }
