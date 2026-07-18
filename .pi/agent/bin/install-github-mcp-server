@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repository="github/github-mcp-server"
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+target="$script_dir/github-mcp-server"
+
+log() {
+  printf '%s\n' "$*" >&2
+}
+
+fail() {
+  printf 'error: %s\n' "$*" >&2
+  exit 1
+}
+
+command -v gh >/dev/null 2>&1 || fail "gh CLI is required"
+command -v shasum >/dev/null 2>&1 || fail "shasum is required"
+
+[ "$(uname -s)" = "Darwin" ] || fail "only macOS is supported"
+
+case "$(uname -m)" in
+  arm64 | aarch64)
+    platform="Darwin_arm64"
+    ;;
+  x86_64 | amd64)
+    platform="Darwin_x86_64"
+    ;;
+  *)
+    fail "unsupported architecture: $(uname -m)"
+    ;;
+esac
+
+tag="$(gh release view --repo "$repository" --json tagName --jq '.tagName')"
+[ -n "$tag" ] || fail "could not determine the latest GitHub MCP server release"
+
+version="${tag#v}"
+asset="github-mcp-server_${platform}.tar.gz"
+checksums="github-mcp-server_${version}_checksums.txt"
+
+if [ -x "$target" ] && "$target" --version 2>/dev/null | grep -Fqx "Version: $version"; then
+  log "GitHub MCP Server $version is already installed"
+  exit 0
+fi
+
+tmp_root="${TMPDIR:-/tmp}"
+mkdir -p "$tmp_root"
+tmp_dir="$(mktemp -d "$tmp_root/github-mcp-server.XXXXXX")"
+install_tmp="$target.tmp.$$"
+cleanup() {
+  rm -rf "$tmp_dir"
+  rm -f "$install_tmp"
+}
+trap cleanup EXIT
+
+log "Downloading GitHub MCP Server $version for $platform"
+gh release download "$tag" \
+  --repo "$repository" \
+  --pattern "$asset" \
+  --pattern "$checksums" \
+  --dir "$tmp_dir"
+
+if gh release verify-asset --help >/dev/null 2>&1 && \
+   gh release verify-asset "$tag" "$tmp_dir/$checksums" --repo "$repository" >/dev/null 2>&1; then
+  log "Release attestation: verified"
+else
+  log "warning: no verifiable release attestation; enforcing the official SHA-256 checksum"
+fi
+
+expected="$(awk -v asset="$asset" '$2 == asset { print $1 }' "$tmp_dir/$checksums")"
+[ -n "$expected" ] || fail "checksum for $asset was not found"
+
+actual="$(shasum -a 256 "$tmp_dir/$asset" | awk '{ print $1 }')"
+[ "$actual" = "$expected" ] || fail "SHA-256 checksum mismatch for $asset"
+log "SHA-256 checksum: verified"
+
+tar -xzf "$tmp_dir/$asset" -C "$tmp_dir" github-mcp-server
+install -m 0755 "$tmp_dir/github-mcp-server" "$install_tmp"
+mv -f "$install_tmp" "$target"
+
+"$target" --version

@@ -13,6 +13,13 @@
     "sentry": {
       "url": "https://mcp.sentry.dev/mcp",
       "auth": "oauth"
+    },
+    "github": {
+      "command": "github-mcp-wrapper",
+      "args": [],
+      "env": {
+        "GITHUB_TOOLS": "get_me,list_pull_requests,pull_request_read,search_pull_requests,create_pull_request,update_pull_request,update_pull_request_branch,pull_request_review_write,add_comment_to_pending_review,add_reply_to_pull_request_comment,add_issue_comment,actions_get,actions_list,actions_run_trigger,get_job_logs"
+      }
     }
   }
 }
