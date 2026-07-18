@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+pi_config_root="$(cd -- "$(dirname -- "$(realpath "${BASH_SOURCE[0]}")")" && pwd)"
+export PATH="$pi_config_root/agent/bin:$PATH"
+
 log() {
   printf '%s\n' "$*" >&2
 }
@@ -85,6 +88,24 @@ configure_github_token() {
   fi
 }
 
+append_git_config() {
+  local key="$1"
+  local value="$2"
+  local index="${GIT_CONFIG_COUNT:-0}"
+
+  export "GIT_CONFIG_KEY_$index=$key"
+  export "GIT_CONFIG_VALUE_$index=$value"
+  export GIT_CONFIG_COUNT="$((index + 1))"
+}
+
+configure_git_for_github() {
+  append_git_config "url.https://github.com/.insteadOf" "git@github.com:"
+  append_git_config "url.https://github.com/.insteadOf" "ssh://git@github.com/"
+  append_git_config "credential.helper" ""
+  append_git_config "credential.helper" "gh-token"
+  append_git_config "commit.gpgsign" "false"
+}
+
 prepare_sandbox_runtime() {
   mkdir -p /tmp/claude
 }
@@ -94,6 +115,7 @@ main() {
 
   install_local_extension_deps
   configure_github_token
+  configure_git_for_github
   prepare_sandbox_runtime
 
   exec pi "$@"

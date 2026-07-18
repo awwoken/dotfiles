@@ -3,12 +3,12 @@
   "allowBrowserProcess": false,
   "network": {
     "allowedDomains": [
-      "raw.githubusercontent.com",
-      "github.com",
-      "*.github.com"
+      "*.githubusercontent.com",
+      "*.github.com",
+      "github.com"
     ],
-    "allowLocalBinding": true,
-    "allowAllUnixSockets": true,
+    "allowLocalBinding": false,
+    "allowAllUnixSockets": false,
     "deniedDomains": []
   },
   "filesystem": {
@@ -24,8 +24,7 @@
       "~/.pi/agent/skills",
       "~/.config/nvm",
       "~/.config/gh/config.yml",
-      "~/.config/gh/hosts.yml",
-      "~/.ssh"
+      "~/.config/gh/hosts.yml"
     ],
     "allowWrite": [
       ".",
