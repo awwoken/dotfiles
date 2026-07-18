@@ -5,9 +5,11 @@
     "allowedDomains": [
       "raw.githubusercontent.com",
       "github.com",
-      "*.github.com"
+      "*.github.com",
+      "registry.npmjs.org",
+      "registry.yarnpkg.com"
     ],
-    "allowLocalBinding": true,
+    "allowLocalBinding": false,
     "allowAllUnixSockets": false,
     "deniedDomains": []
   },
@@ -18,16 +20,17 @@
     ],
     "allowRead": [
       "~/",
+      "/tmp",
       "/var/folders"
-    ],
-    "allowWrite": [
-      "~/.cache",
-      ".",
-      "/tmp"
     ],
     "denyWrite": [
       "~/dotfiles/.pi/agent/sandbox.json",
       "~/.pi/agent/sandbox.json"
+    ],
+    "allowWrite": [
+      "~/",
+      "/tmp",
+      "/var/folders"
     ]
   }
 }

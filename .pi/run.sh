@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-pi_config_root="$(cd -- "$(dirname -- "$(realpath "${BASH_SOURCE[0]}")")" && pwd)"
-export PATH="$pi_config_root/agent/bin:$PATH"
-
 log() {
   printf '%s\n' "$*" >&2
 }
@@ -72,22 +69,6 @@ install_local_extension_deps() {
   done
 }
 
-configure_github_token() {
-  local token
-
-  if [ -n "${GH_TOKEN:-}" ] || [ -n "${GITHUB_TOKEN:-}" ]; then
-    return 0
-  fi
-
-  command -v gh >/dev/null 2>&1 || return 0
-
-  if token="$(gh auth token 2>/dev/null)" && [ -n "$token" ]; then
-    export GH_TOKEN="$token"
-  else
-    log "warning: unable to retrieve GitHub token from gh; authenticated gh commands may fail in Pi"
-  fi
-}
-
 append_git_config() {
   local key="$1"
   local value="$2"
@@ -102,23 +83,22 @@ configure_git_for_github() {
   append_git_config "url.https://github.com/.insteadOf" "git@github.com:"
   append_git_config "url.https://github.com/.insteadOf" "ssh://git@github.com/"
   append_git_config "credential.helper" ""
-  append_git_config "credential.helper" "gh-token"
+  append_git_config "credential.helper" "!gh auth git-credential"
   append_git_config "commit.gpgsign" "false"
 }
 
 prepare_sandbox_runtime() {
-  local cache_home="${XDG_CACHE_HOME:-$HOME/.cache}"
+  local user_tmp
 
-  export TMPDIR="$cache_home/pi/tmp"
-  mkdir -p "$TMPDIR"
-  chmod 700 "$TMPDIR"
+  user_tmp="$(getconf DARWIN_USER_TEMP_DIR)"
+  export TMPDIR="$user_tmp"
+  export CLAUDE_CODE_TMPDIR="$user_tmp"
 }
 
 main() {
   command -v pi >/dev/null 2>&1 || fail "pi CLI was not found in PATH"
 
   install_local_extension_deps
-  configure_github_token
   configure_git_for_github
   prepare_sandbox_runtime
 
