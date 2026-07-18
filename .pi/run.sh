@@ -84,7 +84,6 @@ configure_git_for_github() {
   append_git_config "url.https://github.com/.insteadOf" "ssh://git@github.com/"
   append_git_config "credential.helper" ""
   append_git_config "credential.helper" "!gh auth git-credential"
-  append_git_config "commit.gpgsign" "false"
 }
 
 prepare_sandbox_runtime() {
