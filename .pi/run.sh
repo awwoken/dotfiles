@@ -69,10 +69,32 @@ install_local_extension_deps() {
   done
 }
 
+configure_github_token() {
+  local token
+
+  if [ -n "${GH_TOKEN:-}" ] || [ -n "${GITHUB_TOKEN:-}" ]; then
+    return 0
+  fi
+
+  command -v gh >/dev/null 2>&1 || return 0
+
+  if token="$(gh auth token 2>/dev/null)" && [ -n "$token" ]; then
+    export GH_TOKEN="$token"
+  else
+    log "warning: unable to retrieve GitHub token from gh; authenticated gh commands may fail in Pi"
+  fi
+}
+
+prepare_sandbox_runtime() {
+  mkdir -p /tmp/claude
+}
+
 main() {
   command -v pi >/dev/null 2>&1 || fail "pi CLI was not found in PATH"
 
   install_local_extension_deps
+  configure_github_token
+  prepare_sandbox_runtime
 
   exec pi "$@"
 }

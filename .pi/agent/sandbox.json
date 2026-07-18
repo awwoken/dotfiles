@@ -1,0 +1,50 @@
+{
+  "enabled": true,
+  "allowBrowserProcess": false,
+  "network": {
+    "allowedDomains": [
+      "github.com",
+      "*.github.com",
+      "raw.githubusercontent.com"
+    ],
+    "allowLocalBinding": false,
+    "allowAllUnixSockets": true,
+    "deniedDomains": []
+  },
+  "filesystem": {
+    "denyRead": [
+      "/Users",
+      "/home"
+    ],
+    "allowRead": [
+      ".",
+      "/tmp",
+      "~/.pi/agent/npm/node_modules",
+      "~/.gitconfig",
+      "~/.pi/agent/skills",
+      "~/.config/nvm",
+      "~/.config/gh/config.yml",
+      "~/.config/gh/hosts.yml",
+      "~/.ssh"
+    ],
+    "allowWrite": [
+      ".",
+      "/tmp"
+    ],
+    "denyWrite": [
+      "~/.pi/agent/sandbox.json",
+      ".pi/sandbox.json",
+      ".pi/agent/sandbox.json",
+      ".env",
+      ".env.*",
+      "**/.env",
+      "**/.env.*",
+      "*.pem",
+      "**/*.pem",
+      "*.key",
+      "**/*.key",
+      "secrets/",
+      "credentials/"
+    ]
+  }
+}
