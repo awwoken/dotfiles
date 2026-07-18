@@ -65,16 +65,6 @@ These dotfiles reference the following user/system-level tools. Install them as 
 
 Not listed here: Neovim language servers, formatters, and linters installed by Mason (`mason-tool-installer.nvim`), and Pi extension package dependencies installed by `.pi/run.sh`.
 
-## GitHub MCP server
-
-After stowing the dotfiles and authenticating the GitHub CLI with `gh auth login`, install or update the official GitHub MCP server binary:
-
-```sh
-~/.pi/agent/bin/install-github-mcp-server
-```
-
-The installer selects the latest official release for the current Mac architecture, attempts release-attestation verification, verifies the published SHA-256 checksum, and installs the ignored binary beside the tracked wrapper.
-
 ## macOS preferences
 
 Reduce Dock auto-hide delay:

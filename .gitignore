@@ -1,5 +1,4 @@
 **/node_modules
-.pi/agent/bin/github-mcp-server
 
 .config/mcp/mcp.json
 .config/zed/prompts/
