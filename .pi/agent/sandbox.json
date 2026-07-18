@@ -3,11 +3,11 @@
   "allowBrowserProcess": false,
   "network": {
     "allowedDomains": [
-      "*.githubusercontent.com",
-      "*.github.com",
-      "github.com"
+      "raw.githubusercontent.com",
+      "github.com",
+      "*.github.com"
     ],
-    "allowLocalBinding": false,
+    "allowLocalBinding": true,
     "allowAllUnixSockets": false,
     "deniedDomains": []
   },
@@ -17,33 +17,17 @@
       "/home"
     ],
     "allowRead": [
-      ".",
-      "/tmp",
-      "~/.pi/agent/npm/node_modules",
-      "~/.gitconfig",
-      "~/.pi/agent/skills",
-      "~/.config/nvm",
-      "~/.config/gh/config.yml",
-      "~/.config/gh/hosts.yml"
+      "~/",
+      "/var/folders"
     ],
     "allowWrite": [
+      "~/.cache",
       ".",
       "/tmp"
     ],
     "denyWrite": [
-      "~/.pi/agent/sandbox.json",
-      ".pi/sandbox.json",
-      ".pi/agent/sandbox.json",
-      ".env",
-      ".env.*",
-      "**/.env",
-      "**/.env.*",
-      "*.pem",
-      "**/*.pem",
-      "*.key",
-      "**/*.key",
-      "secrets/",
-      "credentials/"
+      "~/dotfiles/.pi/agent/sandbox.json",
+      "~/.pi/agent/sandbox.json"
     ]
   }
 }

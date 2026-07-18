@@ -107,7 +107,11 @@ configure_git_for_github() {
 }
 
 prepare_sandbox_runtime() {
-  mkdir -p /tmp/claude
+  local cache_home="${XDG_CACHE_HOME:-$HOME/.cache}"
+
+  export TMPDIR="$cache_home/pi/tmp"
+  mkdir -p "$TMPDIR"
+  chmod 700 "$TMPDIR"
 }
 
 main() {
