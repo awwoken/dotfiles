@@ -7,7 +7,7 @@
       "*.github.com",
       "raw.githubusercontent.com"
     ],
-    "allowLocalBinding": false,
+    "allowLocalBinding": true,
     "allowAllUnixSockets": true,
     "deniedDomains": []
   },
