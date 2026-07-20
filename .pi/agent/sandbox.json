@@ -9,7 +9,7 @@
       "registry.npmjs.org",
       "registry.yarnpkg.com"
     ],
-    "allowLocalBinding": false,
+    "allowLocalBinding": true,
     "allowAllUnixSockets": false,
     "deniedDomains": []
   },
