@@ -26,5 +26,31 @@
   "pi-codex-fast": {
     "enabled": true
   },
+  "subagents": {
+    "agentOverrides": {
+      "scout": {
+        "model": "openai-codex/gpt-5.6-luna",
+        "thinking": "high"
+      },
+      "researcher": {
+        "model": "openai-codex/gpt-5.6-luna"
+      },
+      "reviewer": {
+        "model": "openai-codex/gpt-5.6-terra"
+      },
+      "context-builder": {
+        "disabled": true
+      },
+      "planner": {
+        "disabled": true
+      },
+      "delegate": {
+        "disabled": true
+      },
+      "oracle": {
+        "disabled": true
+      }
+    }
+  },
   "theme": "gruvbox-dark-hard"
 }
