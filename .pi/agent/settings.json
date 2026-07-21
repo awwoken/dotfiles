@@ -2,7 +2,7 @@
   "defaultModel": "gpt-5.6-sol",
   "defaultProvider": "openai-codex",
   "defaultThinkingLevel": "high",
-  "lastChangelogVersion": "0.80.10",
+  "lastChangelogVersion": "0.81.1",
   "collapseChangelog": true,
   "doubleEscapeAction": "tree",
   "treeFilterMode": "user-only",
