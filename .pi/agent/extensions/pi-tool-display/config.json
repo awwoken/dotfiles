@@ -1,5 +1,6 @@
 {
   "registerToolOverrides": {
     "bash": false
-  }
+  },
+  "enableNativeUserMessageBox": false
 }
