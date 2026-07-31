@@ -2,7 +2,7 @@
   "defaultModel": "gpt-5.6-sol",
   "defaultProvider": "openai-codex",
   "defaultThinkingLevel": "high",
-  "lastChangelogVersion": "0.81.1",
+  "lastChangelogVersion": "0.83.0",
   "collapseChangelog": true,
   "doubleEscapeAction": "tree",
   "treeFilterMode": "user-only",
@@ -23,7 +23,7 @@
     "prefixTools": true
   },
   "pi-codex-fast": {
-    "enabled": true
+    "enabled": false
   },
   "subagents": {
     "agentOverrides": {
