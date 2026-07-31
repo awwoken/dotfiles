@@ -21,6 +21,7 @@
     "allowRead": [
       "~/",
       "/tmp",
+      "/private/tmp",
       "/var/folders"
     ],
     "denyWrite": [
@@ -30,6 +31,7 @@
     "allowWrite": [
       "~/",
       "/tmp",
+      "/private/tmp",
       "/var/folders"
     ]
   }
