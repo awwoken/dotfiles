@@ -21,13 +21,13 @@ reading, and public GitHub code inspection.
 
 Choose the smallest reliable source set:
 
-| Need                                                                                                   | Use                                           | Notes                                                                           |
-| ------------------------------------------------------------------------------------------------------ | --------------------------------------------- | ------------------------------------------------------------------------------- |
-| Current API syntax, configuration, setup, migration, SDK/CLI behavior, library-specific debugging      | `resolve-library-id` then `query-docs`        | Prefer official docs over general web pages.                                    |
-| Broad discovery, current non-API facts, project/repo discovery, news, comparisons                      | `web_search` via `pi-web-access`             | Discovery only. Snippets are previews, not complete evidence.                   |
-| Reading, summarizing, extracting, comparing, or verifying selected web pages                           | `fetch_content` via `pi-web-access`          | Fetch only the selected relevant page(s).                                       |
-| Exact remote text, source files, code formatting, indentation, raw JSON/YAML, or byte-faithful content | `curl -fsSL` or a temp file                  | Use raw URLs when available; extracted page readers may normalize content.      |
-| Real-world code examples or public repository usage patterns                                           | `fetch_content` on GitHub + `read`/`bash`    | GitHub URLs are cloned locally for exact source inspection.                     |
+| Need                                                                                                   | Use                                              | Notes                                                                      |
+| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------ | -------------------------------------------------------------------------- |
+| Current API syntax, configuration, setup, migration, SDK/CLI behavior, library-specific debugging      | Official docs via `web_search` + `fetch_content` | Restrict discovery to the official domain when practical; fetch the page.  |
+| Broad discovery, current non-API facts, project/repo discovery, news, comparisons                      | `web_search` via `pi-web-access`                 | Discovery only. Snippets are previews, not complete evidence.              |
+| Reading, summarizing, extracting, comparing, or verifying selected web pages                           | `fetch_content` via `pi-web-access`              | Fetch only the selected relevant page(s).                                  |
+| Exact remote text, source files, code formatting, indentation, raw JSON/YAML, or byte-faithful content | `curl -fsSL` or a temp file                      | Use raw URLs when available; extracted page readers may normalize content. |
+| Real-world code examples or public repository usage patterns                                           | `fetch_content` on GitHub + `read`/`bash`        | GitHub URLs are cloned locally for exact source inspection.                |
 
 Do not run every research route by default. Stop once the available evidence is sufficient.
 
@@ -38,101 +38,20 @@ CLI tools, cloud services, setup instructions, config options, API signatures,
 and version migration questions. Use it even for familiar tools because API
 behavior may have changed.
 
-### Step 1: resolve the library ID
+1. If the relevant official documentation URL is already known or supplied, fetch it directly with
+   `fetch_content`; do not search first without a reason.
+2. Otherwise, use `web_search` to discover the official documentation page. Restrict results to the
+   official documentation or project domain when practical.
+3. Fetch the selected page with `fetch_content` and answer from its content, not from search snippets.
+4. For version-specific questions, prefer an explicitly versioned documentation URL, release branch,
+   tag, changelog, or migration guide. State when the available page only documents the latest release.
+5. If official documentation is incomplete, inspect the official source repository or release notes.
+   Use third-party explanations only as supplementary evidence and label them accordingly.
 
-Always call the `resolve-library-id` tool first unless the user explicitly provides a Context7
-library ID in `/org/project` or `/org/project/version` format.
-
-Tool input:
-
-```json
-{
-  "libraryName": "<name>",
-  "query": "<user technical intent>"
-}
-```
-
-Examples:
-
-```json
-{
-  "libraryName": "React",
-  "query": "How to clean up useEffect with async operations"
-}
-```
-
-```json
-{
-  "libraryName": "Next.js",
-  "query": "How to set up app router middleware"
-}
-```
-
-```json
-{
-  "libraryName": "Prisma",
-  "query": "How to define one-to-many relations with cascade delete"
-}
-```
-
-Selection priorities:
-
-1. Exact or near-exact library/package name match.
-2. Description relevance to the user's intent.
-3. Documentation coverage and code snippet count.
-4. Source reputation and benchmark score.
-5. Version match if the user requested a specific version.
-
-If the query is ambiguous and there is no safe best match, ask for clarification.
-If a version is requested, use the closest listed version-specific ID, such as
-`/vercel/next.js/v14.3.0-canary.87`.
-
-### Step 2: query the docs
-
-Call the `query-docs` tool with the selected Context7-compatible library ID.
-
-Tool input:
-
-```json
-{
-  "libraryId": "<libraryId>",
-  "query": "<user technical intent>"
-}
-```
-
-Examples:
-
-```json
-{
-  "libraryId": "/facebook/react",
-  "query": "React useEffect cleanup function with async operations"
-}
-```
-
-```json
-{
-  "libraryId": "/vercel/next.js",
-  "query": "How to add authentication middleware to app router"
-}
-```
-
-```json
-{
-  "libraryId": "/prisma/prisma",
-  "query": "How to define one-to-many relations with cascade delete"
-}
-```
-
-Query rules:
-
-- Use the user's technical intent as the query; avoid vague one-word queries.
-- Do not include secrets, credentials, personal data, proprietary code, or large internal snippets.
-- Do not call Context7 tools more than three times for one question. If still incomplete, use the best available result and state the limitation.
-
-Error handling:
-
-- If Context7 reports quota exhaustion or authentication failure, tell the user and note that the tools use the configured `CONTEXT7_API_KEY`. Do not silently fall back to training data.
-- If DNS/network failures occur, do not repeatedly retry the same failing call; state the limitation and ask whether to use another research route.
+Use the user's technical intent as the search query; avoid vague one-word queries. Do not include
+secrets, credentials, personal data, proprietary code, or large internal snippets. If DNS, network,
+or provider limits block the route, do not repeatedly retry the same failing call; state the
+limitation and try a different configured provider or exact official URL when available.
 
 ## Web discovery and page reading
 

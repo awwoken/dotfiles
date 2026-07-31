@@ -16,8 +16,7 @@
     "npm:pi-subagents",
     "npm:pi-sandbox",
     "npm:pi-tool-display",
-    "git:git@github.com:calesennett/pi-codex-fast.git",
-    "npm:@upstash/context7-pi"
+    "git:git@github.com:calesennett/pi-codex-fast.git"
   ],
   "mcp": {
     "configPath": "mcp.json",
