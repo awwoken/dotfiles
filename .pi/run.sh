@@ -69,23 +69,6 @@ install_local_extension_deps() {
   done
 }
 
-append_git_config() {
-  local key="$1"
-  local value="$2"
-  local index="${GIT_CONFIG_COUNT:-0}"
-
-  export "GIT_CONFIG_KEY_$index=$key"
-  export "GIT_CONFIG_VALUE_$index=$value"
-  export GIT_CONFIG_COUNT="$((index + 1))"
-}
-
-configure_git_for_github() {
-  append_git_config "url.https://github.com/.insteadOf" "git@github.com:"
-  append_git_config "url.https://github.com/.insteadOf" "ssh://git@github.com/"
-  append_git_config "credential.helper" ""
-  append_git_config "credential.helper" "!gh auth git-credential"
-}
-
 prepare_sandbox_runtime() {
   local user_tmp
 
@@ -96,9 +79,8 @@ prepare_sandbox_runtime() {
 
 main() {
   command -v pi >/dev/null 2>&1 || fail "pi CLI was not found in PATH"
-
+  
   install_local_extension_deps
-  configure_git_for_github
   prepare_sandbox_runtime
 
   exec pi "$@"
