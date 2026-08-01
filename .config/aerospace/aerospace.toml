@@ -24,9 +24,7 @@ gaps.outer.top = 6
 gaps.outer.bottom = 10
 
 on-window-detected = [
-  # Slack screen-sharing overlays often have an empty title.
   { if = 'test %{app-bundle-id} = com.tinyspeck.slackmacgap && test %{window-title} ~= "^$"', run = 'layout floating' },
-  # Keep Huddle windows from changing the main Slack workspace layout.
   { if = 'test %{app-bundle-id} = com.tinyspeck.slackmacgap && test %{window-title} ~= huddle', run = 'layout floating' },
   { if = 'test %{app-bundle-id} = com.apple.systempreferences', run = 'layout floating' },
   { if = 'test %{app-bundle-id} = com.apple.calculator', run = 'layout floating' },
