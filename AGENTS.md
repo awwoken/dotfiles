@@ -12,6 +12,8 @@ Examples:
 
 Avoid modifying generated dependencies, caches, or installed package contents unless explicitly requested.
 
+After a meaningful repository change, review `README.md` and update it when the change affects documented structure, installation, prerequisites, tooling, workflows, or behavior. Do not leave the README stale, but avoid unrelated documentation churn when the change has no user-facing or repository-level impact.
+
 ## Structure overview
 
 - `./.pi/agent/` — Pi agent prompts, skills, and extensions.
