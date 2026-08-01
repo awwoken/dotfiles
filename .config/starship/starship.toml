@@ -1,13 +1,59 @@
 add_newline = false
-format = "$sudo$directory$git_branch$character"
+format = "$sudo$username$hostname$directory$git_branch$git_status$git_state$nodejs$fill$status$cmd_duration$line_break$character"
+
+[username]
+show_always = true
+format = "[$user]($style)"
+
+[hostname]
+ssh_only = false
+format = "[@$hostname]($style):"
 
 [directory]
-truncation_length = 2
-truncate_to_repo = true
+truncation_length = 3
+truncate_to_repo = false
 
 [git_branch]
 symbol = ""
-format = "[$branch]($style) "
+format = '[\($branch\)]($style) '
+
+[git_status]
+format = "$staged$modified$untracked$ahead_behind"
+staged = "[+${count}](green) "
+modified = "[~${count}](yellow) "
+untracked = "[?${count}](dimmed cyan) "
+ahead = "[⇡${count}](cyan) "
+behind = "[⇣${count}](cyan) "
+diverged = "[⇡${ahead_count}⇣${behind_count}](cyan) "
+
+[git_state]
+format = "[$state( $progress_current/$progress_total)]($style) "
+rebase = "REBASE"
+merge = "MERGE"
+revert = "REVERT"
+cherry_pick = "CHERRY-PICK"
+bisect = "BISECT"
+am = "AM"
+am_or_rebase = "AM/REBASE"
+style = "bold yellow"
+
+[nodejs]
+format = "[node $version]($style) "
+style = "bold green"
+
+[fill]
+symbol = " "
+
+[status]
+disabled = false
+format = "[exit $status]($style) "
+style = "bold red"
+
+[cmd_duration]
+min_time = 1000
+show_milliseconds = true
+format = "[$duration]($style)"
+style = "dimmed yellow"
 
 [sudo]
 disabled = false
