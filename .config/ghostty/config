@@ -1,0 +1,20 @@
+font-size = 20
+font-feature = -liga
+font-feature = -clig
+font-feature = -calt
+minimum-contrast = 1.1
+
+window-padding-x = 8
+window-padding-y = 8
+window-padding-balance = true
+window-save-state = never
+unfocused-split-opacity = 1
+
+mouse-hide-while-typing = true
+confirm-close-surface = false
+
+macos-dock-drop-behavior = new-window
+macos-option-as-alt = true
+macos-titlebar-style = hidden
+
+keybind = super+t=new_window
