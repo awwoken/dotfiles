@@ -11,6 +11,7 @@
   },
   "packages": [
     "git:git@github.com:hasit/pi-community-themes.git",
+    "npm:pi-blackhole",
     "npm:pi-mcp-adapter",
     "npm:pi-web-access",
     "npm:pi-subagents",

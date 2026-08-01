@@ -1,0 +1,21 @@
+{
+  "compaction": "auto",
+  "compactionEngine": "blackhole",
+  "tailBehavior": "pi-default",
+  "midRunCompaction": "off",
+  "observeAfterTokens": 20000,
+  "reflectAfterTokens": 40000,
+  "compactAfterTokens": 200000,
+  "memory": true,
+  "model": {
+    "provider": "openai-codex",
+    "id": "gpt-5.6-luna",
+    "thinking": "low"
+  },
+  "reflectorModel": {
+    "provider": "openai-codex",
+    "id": "gpt-5.6-luna",
+    "thinking": "high"
+  },
+  "sessionFallback": false
+}
