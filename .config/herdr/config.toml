@@ -1,2 +1,4 @@
+onboarding = false
+
 [theme]
 name = "gruvbox"
