@@ -21,7 +21,7 @@ Avoid modifying generated dependencies, caches, or installed package contents un
 - `./.hushlogin` — Suppresses macOS login messages.
 - `./.config/` — XDG application configuration:
   - `aerospace/` — AeroSpace window manager.
-  - `ghostty/`, `kitty/` — Terminal emulator configs.
+  - `ghostty/` — Ghostty terminal emulator config.
   - `nvim/` — Neovim configuration.
   - `lazygit/` — Lazygit configuration.
   - `starship/` — Starship prompt configuration.

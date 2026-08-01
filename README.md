@@ -13,7 +13,6 @@ My development environment configuration, managed as a dotfiles repository and i
 │   ├── fd/                 # fd defaults
 │   ├── ghostty/            # Ghostty terminal
 │   ├── helix/              # Helix language configuration
-│   ├── kitty/              # Kitty terminal
 │   ├── lazygit/            # Lazygit configuration
 │   ├── nvim/               # Neovim configuration
 │   ├── ripgrep/            # ripgrep defaults
@@ -56,12 +55,12 @@ These dotfiles reference the following user/system-level tools. Install them as 
 
 - Core shell/dev tools: `git`, `gh`, `node`, `npm`, `bun`, `nvm`, `stow`, `zsh`
 - Shell quality-of-life tools: `bat`, `eza`, `fd`, `ripgrep`, `starship`, `zoxide`
-- Terminal/editor apps: `aerospace`, `ghostty`, `helix`, `kitty`, `lazygit`, `neovim`, `vim`, `yazi`, `zed`
+- Terminal/editor apps: `aerospace`, `ghostty`, `helix`, `lazygit`, `neovim`, `vim`, `yazi`, `zed`
 - Git UI helpers: `diff-so-fancy`
 - Pi agent: `pi` CLI; `.pi/run.sh` uses `npm` to install local extension dependencies automatically
 - Helix/Zed external formatters and language tools: `prettier`, `stylua`, `superhtml`, `taplo`, `vscode-html-language-server`
 - Android/Java paths in `.zshrc`: Android SDK platform tools and `openjdk@17`
-- Fonts: a Nerd Font such as `JetBrainsMonoNL Nerd Font Propo` for Kitty icons/glyphs
+- Fonts: a Nerd Font such as `JetBrainsMonoNL Nerd Font Propo` for terminal and editor icons/glyphs
 
 Not listed here: Neovim language servers, formatters, and linters installed by Mason (`mason-tool-installer.nvim`), and Pi extension package dependencies installed by `.pi/run.sh`.
 
