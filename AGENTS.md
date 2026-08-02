@@ -23,6 +23,7 @@ After a meaningful repository change, review `README.md` and update it when the 
 - `./.hushlogin` — Suppresses macOS login messages.
 - `./.config/` — XDG application configuration:
   - `aerospace/` — AeroSpace window manager.
+  - `colima/` — Colima defaults for newly created virtual machines.
   - `ghostty/` — Ghostty terminal emulator config.
   - `nvim/` — Neovim configuration.
   - `lazygit/` — Lazygit configuration.

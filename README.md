@@ -10,6 +10,7 @@ My development environment configuration, managed as a dotfiles repository and i
 ├── .vimrc                  # Vim configuration
 ├── .config/
 │   ├── aerospace/          # AeroSpace window manager
+│   ├── colima/             # Colima defaults for new virtual machines
 │   ├── fd/                 # fd defaults
 │   ├── ghostty/            # Ghostty terminal
 │   ├── helix/              # Helix language configuration
@@ -39,8 +40,11 @@ Clone the repository and stow the files into your home directory:
 ```sh
 git clone <repo-url> ~/dotfiles
 cd ~/dotfiles
+mkdir -p ~/.config/colima
 stow .
 ```
+
+Creating `~/.config/colima` before running Stow keeps Colima's generated virtual-machine state outside the repository while allowing Stow to link the tracked `_templates` directory.
 
 If a target file already exists in `$HOME`, move it aside or merge it into the tracked version in this repository before running Stow.
 
@@ -62,6 +66,7 @@ These dotfiles reference the following user/system-level tools. Install them as 
 - Shell quality-of-life tools: `bat`, `eza`, `fd`, `ripgrep`, `starship`, `zoxide`
 - Terminal/editor apps: `aerospace`, `ghostty`, `helix`, `herdr`, `lazygit`, `neovim`, `vim`, `yazi`, `zed`
 - Git UI helpers: `diff-so-fancy`
+- Container tooling: `colima`, `docker`, `docker-buildx`, `docker-compose`
 - Pi agent: `pi` CLI; `.pi/run.sh` uses `npm` to install local extension dependencies automatically
 - Helix/Zed external formatters and language tools: `prettier`, `stylua`, `superhtml`, `taplo`, `vscode-html-language-server`
 - Android/Java paths in `.zshrc`: Android SDK platform tools and `openjdk@17`
