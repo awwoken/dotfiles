@@ -12,6 +12,8 @@ Examples:
 
 Avoid modifying generated dependencies, caches, or installed package contents unless explicitly requested.
 
+When adding any new Stow-managed folder, first determine whether the application writes mutable state, caches, generated files, or runtime data alongside its configuration. Keep the application's state-bearing parent directory as a real directory under `$HOME` and Stow only the stable configuration files or subdirectories. Prevent Stow from folding the entire state-bearing directory into the repository, document any required target-directory creation in `README.md`, and verify the link boundary with `stow --simulate --verbose .` before applying it. Apply this rule to every new managed folder, not only known stateful applications.
+
 After a meaningful repository change, review `README.md` and update it when the change affects documented structure, installation, prerequisites, tooling, workflows, or behavior. Do not leave the README stale, but avoid unrelated documentation churn when the change has no user-facing or repository-level impact.
 
 ## Structure overview
