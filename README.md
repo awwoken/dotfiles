@@ -13,7 +13,6 @@ My development environment configuration, managed as a dotfiles repository and i
 │   ├── colima/             # Colima defaults for new virtual machines
 │   ├── fd/                 # fd defaults
 │   ├── ghostty/            # Ghostty terminal
-│   ├── helix/              # Helix language configuration
 │   ├── herdr/              # Herdr agent multiplexer
 │   ├── lazygit/            # Lazygit configuration
 │   ├── nvim/               # Neovim configuration
@@ -64,11 +63,11 @@ These dotfiles reference the following user/system-level tools. Install them as 
 
 - Core shell/dev tools: `git`, `gh`, `node`, `npm`, `bun`, `nvm`, `stow`, `zsh`
 - Shell quality-of-life tools: `bat`, `eza`, `fd`, `ripgrep`, `starship`, `zoxide`
-- Terminal/editor apps: `aerospace`, `ghostty`, `helix`, `herdr`, `lazygit`, `neovim`, `vim`, `yazi`, `zed`
+- Terminal/editor apps: `aerospace`, `ghostty`, `herdr`, `lazygit`, `neovim`, `vim`, `yazi`, `zed`
 - Git UI helpers: `diff-so-fancy`
 - Container tooling: `colima`, `docker`, `docker-buildx`, `docker-compose`
 - Pi agent: `pi` CLI; `.pi/run.sh` uses `npm` to install local extension dependencies automatically
-- Helix/Zed external formatters and language tools: `prettier`, `stylua`, `superhtml`, `taplo`, `vscode-html-language-server`
+- Zed external formatter: `stylua`
 - Android/Java paths in `.zshrc`: Android SDK platform tools and `openjdk@17`
 - Fonts: a Nerd Font such as `JetBrainsMonoNL Nerd Font Propo` for terminal and editor icons/glyphs
 
