@@ -13,6 +13,8 @@ If the user asks simply to “commit”, “commit everything”, or “commit a
 
 Words such as “all”, “everything”, and “current” define the **scope of changes to include**, not the number of commits to create. Include all eligible changes, but partition them into as many focused commits as their distinct intents require. Create one ordinary commit only when the user explicitly requests a single commit or when all included changes genuinely form one reviewable intent. In-progress merge commits are the special case described below.
 
+When the user explicitly asks to commit all changes or everything, include eligible tracked and untracked changes regardless of who created them or whether the current agent worked on those files. Do not silently exclude pre-existing changes, user-authored changes, or changes produced by another agent or tool. Review and group them by intent like any other change; if their purpose cannot be determined safely, ask the user rather than omitting them.
+
 A change can be “related” and still be too broad for one commit. Split work by reviewable intent and project boundary rather than by convenience or by the user's broad task name. The right boundaries depend on the repository: a library, CLI, dotfiles repo, infrastructure repo, backend service, mobile app, documentation site, and fullstack app all have different natural layers.
 
 ## Commit Message Convention
