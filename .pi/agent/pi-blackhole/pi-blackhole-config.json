@@ -5,7 +5,7 @@
   "midRunCompaction": "off",
   "observeAfterTokens": 20000,
   "reflectAfterTokens": 40000,
-  "compactAfterTokens": 200000,
+  "compactAfterTokens": 180000,
   "memory": true,
   "model": {
     "provider": "openai-codex",
