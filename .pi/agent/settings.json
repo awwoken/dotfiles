@@ -1,7 +1,7 @@
 {
-  "defaultModel": "gpt-5.6-sol",
+  "defaultModel": "gpt-5.6-luna",
   "defaultProvider": "openai-codex",
-  "defaultThinkingLevel": "high",
+  "defaultThinkingLevel": "xhigh",
   "lastChangelogVersion": "0.83.0",
   "collapseChangelog": true,
   "doubleEscapeAction": "tree",
@@ -27,16 +27,29 @@
     "enabled": false
   },
   "subagents": {
+    "defaultModel": "openai-codex/gpt-5.6-luna",
     "agentOverrides": {
       "scout": {
         "model": "openai-codex/gpt-5.6-luna",
         "thinking": "high"
       },
       "researcher": {
-        "model": "openai-codex/gpt-5.6-luna"
+        "model": "openai-codex/gpt-5.6-luna",
+        "thinking": "medium"
+      },
+      "advisor": {
+        "description": "Sol strategy advisor for consequential architecture, product, and tradeoff decisions",
+        "model": "openai-codex/gpt-5.6-sol",
+        "thinking": "xhigh"
+      },
+      "worker": {
+        "description": "Luna implementation agent for bounded work with approved scope and direction; use a Sol override for exceptional high-risk implementation",
+        "model": "openai-codex/gpt-5.6-luna",
+        "thinking": "high"
       },
       "reviewer": {
-        "model": "openai-codex/gpt-5.6-terra"
+        "model": "openai-codex/gpt-5.6-terra",
+        "thinking": "high"
       },
       "context-builder": {
         "disabled": true

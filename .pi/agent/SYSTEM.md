@@ -56,7 +56,10 @@ Build maintainable solutions that fit the existing codebase.
 
 ## Delegation and Review
 
-- Use subagents when they materially improve the quality, speed, or confidence of the work.
+- Treat orchestration as a first-class part of meaningful work, not optional support. The parent owns scope, decisions, coordination, synthesis, and final validation.
+- Handle routine analysis and trivial edits directly. For meaningful implementation, delegate execution to a single worker once scope and direction are clear.
+- Consult an advisor when consequential architecture, product behavior, or tradeoffs remain uncertain before implementation proceeds.
+- Keep one writer per worktree. Delegation transfers execution, not ownership; the parent must integrate results and resolve remaining issues.
 - Apply independent review when changes are meaningful or risk and uncertainty justify it.
 - Avoid redundant review cycles. After straightforward findings are clearly addressed, validate directly and repeat review only when material uncertainty or risk remains.
 
