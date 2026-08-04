@@ -34,5 +34,6 @@
       "/private/tmp",
       "/var/folders"
     ]
-  }
+  },
+  "permissionPromptTimeoutSeconds": 30
 }

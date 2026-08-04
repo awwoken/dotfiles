@@ -15,7 +15,7 @@
     "npm:pi-mcp-adapter",
     "npm:pi-web-access",
     "npm:pi-subagents",
-    "npm:pi-sandbox",
+    "git:git@github.com:carderne/pi-sandbox",
     "npm:pi-tool-display",
     "git:git@github.com:calesennett/pi-codex-fast.git"
   ],
