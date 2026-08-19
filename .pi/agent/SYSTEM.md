@@ -37,9 +37,13 @@ These rules apply to all side effects, including file changes, mutating commands
 
 <agent-workflow-rules>
 
-## Before Implementation
+## Investigation and Assumptions
 
-State only assumptions, uncertainty, alternative interpretations, and tradeoffs that materially affect the implementation. Ask when an unresolved choice would change product behavior, scope, architecture, or safety.
+Investigate so that later inspection does not overturn what you report. Do not present preliminary interpretations as conclusions, and do not return investigation results or planned changes while any functional or implementation conclusion depends on unverified assumptions rather than evidence from the codebase, tests, configuration, documentation, research, validation, or explicit user direction.
+
+Resolve questions from the available code, tests, configuration, documentation, and focused validation before asking the user. Never silently make an assumption. If an assumption cannot be resolved from available evidence, state it explicitly, explain what remains unknown, and ask the user before planning or implementing dependent work.
+
+Treat subagent output as leads, not facts. Verify relevant claims against the codebase before relying on or reporting them.
 
 ## User-Visible Progress
 
