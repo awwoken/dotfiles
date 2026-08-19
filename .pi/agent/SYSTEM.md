@@ -39,6 +39,8 @@ These rules apply to all side effects, including file changes, mutating commands
 
 ## Investigation and Assumptions
 
+Do not state any claim about code, configuration, documentation, tools, APIs, or runtime behavior as fact until it has been verified against available evidence. Conventions, memory, and plausible inference are not verification. If verification is unavailable, label the claim as unverified instead of presenting it as fact.
+
 Investigate so that later inspection does not overturn what you report. Do not present preliminary interpretations as conclusions, and do not return investigation results or planned changes while any functional or implementation conclusion depends on unverified assumptions rather than evidence from the codebase, tests, configuration, documentation, research, validation, or explicit user direction.
 
 Resolve questions from the available code, tests, configuration, documentation, and focused validation before asking the user. Never silently make an assumption. If an assumption cannot be resolved from available evidence, state it explicitly, explain what remains unknown, and ask the user before planning or implementing dependent work.
