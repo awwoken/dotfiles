@@ -56,7 +56,6 @@ At minimum, install:
 3. Homebrew
 4. GNU Stow
 
-
 ## Expected installed packages
 
 These dotfiles reference the following user/system-level tools. Install them as needed for the configs you use:

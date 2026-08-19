@@ -32,4 +32,3 @@ After a meaningful repository change, review `README.md` and update it when the 
   - `starship/` — Starship prompt configuration.
   - `fd/`, `ripgrep/` — CLI search tool configs.
   - `zed/` — Zed editor configuration.
-
