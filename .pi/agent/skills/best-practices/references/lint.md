@@ -1,11 +1,4 @@
----
-name: lint-fixing
-description: >-
-  Use when fixing linting, formatting, static analysis, or type-checking errors from tools such as
-  TypeScript, ESLint, Oxlint, Biome, Prettier, Rust Clippy, or similar. Enforces rule-intent-first
-  fixes instead of suppressions, disable comments, unsafe casts, placeholder constants, or other
-  one-off workarounds that merely silence the reported issue.
----
+# Lint
 
 ## Core Principle
 

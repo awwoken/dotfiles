@@ -1,11 +1,4 @@
----
-name: nestjs
-description: >-
-  Use when implementing or modifying NestJS controllers, services, modules,
-  DTOs, entities, guards, interceptors, providers, tests, or backend TypeScript
-  support code. Covers NestJS layering, dependency injection, validation,
-  errors, and file structure.
----
+# NestJS
 
 ## File Order
 
@@ -24,9 +17,21 @@ Do not put functions, constants, interfaces, types, helper classes, or secondary
 - Do not inline ad-hoc type aliases or interfaces in implementation files. DTOs, entities, request/response shapes, and reusable/internal support types belong in their own files or established local type/schema locations.
 - Existing violations may remain if unrelated, but do not add to them. If the touched change needs new support code, create the correct file boundary instead of expanding the existing mixed file.
 
+## File Paths and Names
+
+A file's full path must make its responsibility clear without requiring someone to open it.
+
+- Put support files in an established responsibility directory such as `constants/`, `utils/`, `types/`, `schemas/`, or `mappers/`.
+- Responsibility suffixes do not permit mixing different responsibilities in one folder. A flat module using explicit established suffixes such as `.constants.ts`, `.mapper.ts`, or `.schema.ts` is acceptable only when the module is very small and contains at most one file for each responsibility.
+- When a module has multiple files for one responsibility, organize them under the corresponding responsibility directory.
+- Do not place an ambiguously named support file directly under a feature or module directory when its role is not evident from the path.
+- Name the file for its domain content and use its directory or suffix to identify its responsibility.
+
 ## No Small-Change Exemption
 
 These file-boundary rules apply regardless of size. A one-line helper, one-case mapper, tiny constant, or single-use type is still support code and must not be added inline to a NestJS service, controller, module, provider, DTO, or entity file.
+
+Calling support code local, private, small, single-use, or close to its usage does not permit keeping it in the implementation file.
 
 ## Controllers and Services
 
