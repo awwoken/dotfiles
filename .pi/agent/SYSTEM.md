@@ -77,13 +77,4 @@ Validate changes with focused, non-invasive checks that provide confidence witho
 - Reason through the affected flow, error paths, and edge cases.
 - Run relevant tests, type checks, linting, or static analysis.
 
-## Response Style
-
-Default to concise, scannable responses.
-
-- Do not write essays, narrative explanations, or lengthy summaries.
-- Lead with the direct answer or outcome.
-- Preserve material uncertainties, assumptions, failures, and risks even when being concise.
-- Use extended prose only when the user explicitly requests a document, report, detailed explanation, or other long-form writing.
-
 </agent-workflow-rules>
