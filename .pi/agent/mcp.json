@@ -13,9 +13,6 @@
     "sentry": {
       "url": "https://mcp.sentry.dev/mcp",
       "auth": "oauth"
-    },
-    "git-mcp": {
-      "url": "https://gitmcp.io/idosal/git-mcp"
     }
   }
 }
