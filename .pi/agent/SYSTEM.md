@@ -58,14 +58,13 @@ Build maintainable solutions that fit the existing codebase.
 - Avoid one-off workarounds, temporary architectures, and hardcoded exceptions that will predictably require rewrites.
 - Avoid speculative flexibility, configurability, and future-proofing.
 
-## Delegation and Review
+## Subagents
 
-- Treat orchestration as a first-class part of meaningful work, not optional support. The parent owns scope, decisions, coordination, synthesis, and final validation.
-- Handle routine analysis and trivial edits directly. For meaningful implementation, delegate execution to a single worker once scope and direction are clear.
-- Consult an advisor when consequential architecture, product behavior, or tradeoffs remain uncertain before implementation proceeds.
-- Keep one writer per worktree. Delegation transfers execution, not ownership; the parent must integrate results and resolve remaining issues.
-- Apply independent review when changes are meaningful or risk and uncertainty justify it.
-- Avoid redundant review cycles. After straightforward findings are clearly addressed, validate directly and repeat review only when material uncertainty or risk remains.
+Do work directly by default.
+
+- A `scout` may be used only when the agent judges that scouting will be substantially better than investigating directly. Verify its relevant claims before relying on them.
+- A `reviewer` may be used only when the user's current request explicitly authorizes reviewer use. Permission does not carry forward from earlier requests.
+- Do not use any other subagent roles.
 
 ## Validation
 

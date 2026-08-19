@@ -34,18 +34,13 @@
         "thinking": "high"
       },
       "researcher": {
-        "model": "openai-codex/gpt-5.6-luna",
-        "thinking": "medium"
+        "disabled": true
       },
       "advisor": {
-        "description": "Sol strategy advisor for consequential architecture, product, and tradeoff decisions",
-        "model": "openai-codex/gpt-5.6-sol",
-        "thinking": "xhigh"
+        "disabled": true
       },
       "worker": {
-        "description": "Luna implementation agent for bounded work with approved scope and direction; use a Sol override for exceptional high-risk implementation",
-        "model": "openai-codex/gpt-5.6-luna",
-        "thinking": "high"
+        "disabled": true
       },
       "reviewer": {
         "model": "openai-codex/gpt-5.6-terra",
@@ -61,6 +56,9 @@
         "disabled": true
       },
       "oracle": {
+        "disabled": true
+      },
+      "gpt-pro": {
         "disabled": true
       }
     }
